@@ -3,7 +3,7 @@ import { noticeService, authService } from '../services/api';
 import { useNavigate } from 'react-router-dom';
 import { Trash2 } from 'lucide-react';
 
-const CATEGORIES = ['CSE', 'ECE', 'ME', 'NSS', 'IEEE', 'Arts Club', 'Whole College'];
+const CATEGORIES = ['CSE', 'ECE', 'EC', 'ME', 'CE', 'RAI', 'NSS', 'IEEE', 'Arts Club', 'Whole College'];
 
 const Dashboard = () => {
     const [notices, setNotices] = useState([]);
@@ -69,34 +69,45 @@ const Dashboard = () => {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2">
-                {/* Create Form */}
-                <div className="card" style={{ padding: '1.5rem', height: 'fit-content' }}>
-                    <h2 style={{ marginBottom: '1.5rem' }}>Post New Notice</h2>
-                    {error && <div style={{ color: 'red', marginBottom: '1rem' }}>{error}</div>}
-                    {success && <div style={{ color: 'green', marginBottom: '1rem' }}>{success}</div>}
+                {/* Create Form or Student Welcome */}
+                {user.role !== 'student' ? (
+                    <div className="card" style={{ padding: '1.5rem', height: 'fit-content' }}>
+                        <h2 style={{ marginBottom: '1.5rem' }}>Post New Notice</h2>
+                        {error && <div style={{ color: 'red', marginBottom: '1rem' }}>{error}</div>}
+                        {success && <div style={{ color: 'green', marginBottom: '1rem' }}>{success}</div>}
 
-                    <form onSubmit={handleCreate}>
-                        <div className="form-group">
-                            <label className="form-label">Title</label>
-                            <input type="text" className="form-input" required value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} />
-                        </div>
-                        <div className="form-group">
-                            <label className="form-label">Description</label>
-                            <textarea className="form-input" required rows="4" value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })}></textarea>
-                        </div>
-                        <div className="form-group">
-                            <label className="form-label">Category</label>
-                            <select className="form-input" value={formData.category} onChange={e => setFormData({ ...formData, category: e.target.value })}>
-                                {CATEGORIES.map(cat => <option key={cat} value={cat}>{cat}</option>)}
-                            </select>
-                        </div>
-                        <div className="form-group">
-                            <label className="form-label">Attachment URL (Optional)</label>
-                            <input type="url" className="form-input" value={formData.attachment} onChange={e => setFormData({ ...formData, attachment: e.target.value })} />
-                        </div>
-                        <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>Post Notice</button>
-                    </form>
-                </div>
+                        <form onSubmit={handleCreate}>
+                            <div className="form-group">
+                                <label className="form-label">Title</label>
+                                <input type="text" className="form-input" required value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} />
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Description</label>
+                                <textarea className="form-input" required rows="4" value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })}></textarea>
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Category</label>
+                                <select className="form-input" value={formData.category} onChange={e => setFormData({ ...formData, category: e.target.value })}>
+                                    {CATEGORIES.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                                </select>
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Attachment URL (Optional)</label>
+                                <input type="url" className="form-input" value={formData.attachment} onChange={e => setFormData({ ...formData, attachment: e.target.value })} />
+                            </div>
+                            <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>Post Notice</button>
+                        </form>
+                    </div>
+                ) : (
+                    <div className="card" style={{ padding: '1.5rem', height: 'fit-content' }}>
+                        <h2 style={{ marginBottom: '1.5rem' }}>Welcome to your Dashboard</h2>
+                        <p style={{ color: 'var(--text-muted)', lineHeight: '1.6' }}>
+                            Here you can view the notices relevant to you. As a student, you have view-only access to the notice board.
+                            <br /><br />
+                            If you need to post an announcement for a club or event, please contact your department head or club representative.
+                        </p>
+                    </div>
+                )}
 
                 {/* Existing Notices List */}
                 <div>

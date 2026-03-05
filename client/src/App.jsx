@@ -7,6 +7,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import CategoryPage from './pages/CategoryPage';
 import ArchivePage from './pages/ArchivePage';
+import UserManagement from './pages/UserManagement';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/admin/users" element={<UserManagement />} />
             <Route path="/category/:catName" element={<CategoryPage />} />
             <Route path="/archive" element={<ArchivePage />} />
           </Routes>

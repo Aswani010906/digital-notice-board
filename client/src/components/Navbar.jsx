@@ -26,6 +26,9 @@ const Navbar = () => {
                     <Link to="/archive" style={{ color: 'var(--text-muted)' }}>Archive</Link>
                     {user ? (
                         <>
+                            {user.role === 'admin' && (
+                                <Link to="/admin/users" style={{ color: 'var(--text-main)', fontWeight: '500' }}>Admin Users</Link>
+                            )}
                             <Link to="/dashboard" style={{ color: 'var(--text-main)', fontWeight: '500' }}>Dashboard</Link>
                             <button className="btn btn-outline" onClick={handleLogout}>Logout</button>
                         </>

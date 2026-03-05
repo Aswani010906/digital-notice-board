@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { noticeService } from '../services/api';
+import { noticeService, authService } from '../services/api';
 import NoticeCard from '../components/NoticeCard';
 import { useNavigate } from 'react-router-dom';
 
-const CATEGORIES = ['CSE', 'ECE', 'ME', 'NSS', 'IEEE', 'Arts Club', 'Whole College'];
+const CATEGORIES = ['CSE', 'ECE', 'EC', 'ME', 'CE', 'RAI', 'NSS', 'IEEE', 'Arts Club', 'Whole College'];
 
 const Home = () => {
     const [notices, setNotices] = useState([]);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
+    const user = authService.getCurrentUser();
 
     useEffect(() => {
         fetchNotices();
@@ -17,7 +18,15 @@ const Home = () => {
     const fetchNotices = async () => {
         try {
             const data = await noticeService.getNotices();
-            setNotices(data);
+
+            if (user && user.role === 'student' && user.department) {
+                // Students only see Whole College, Clubs, and their own Department
+                const allowedCategories = ['Whole College', 'NSS', 'IEEE', 'Arts Club', user.department];
+                const filtered = data.filter(n => allowedCategories.includes(n.category));
+                setNotices(filtered);
+            } else {
+                setNotices(data);
+            }
         } catch (error) {
             console.error('Error fetching notices', error);
         } finally {
