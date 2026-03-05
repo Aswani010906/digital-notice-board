@@ -44,11 +44,16 @@ export const noticeService = {
         return res.data;
     },
     createNotice: async (data) => {
-        const res = await api.post('/notices', data);
+        // Automatically handled by axios if data is FormData
+        const res = await api.post('/notices', data, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        });
         return res.data;
     },
     updateNotice: async (id, data) => {
-        const res = await api.put(`/notices/${id}`, data);
+        const res = await api.put(`/notices/${id}`, data, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        });
         return res.data;
     },
     deleteNotice: async (id) => {

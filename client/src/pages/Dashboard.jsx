@@ -8,7 +8,7 @@ const CATEGORIES = ['CSE', 'ECE', 'EC', 'ME', 'CE', 'RAI', 'NSS', 'IEEE', 'Arts 
 const Dashboard = () => {
     const [notices, setNotices] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [formData, setFormData] = useState({ title: '', description: '', category: 'Whole College', attachment: '' });
+    const [formData, setFormData] = useState({ title: '', description: '', category: 'Whole College', deadline: '', expiryDate: '', file: null });
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const navigate = useNavigate();
@@ -39,9 +39,17 @@ const Dashboard = () => {
     const handleCreate = async (e) => {
         e.preventDefault();
         try {
-            await noticeService.createNotice(formData);
+            const data = new FormData();
+            data.append('title', formData.title);
+            data.append('description', formData.description);
+            data.append('category', formData.category);
+            if (formData.deadline) data.append('deadline', formData.deadline);
+            if (formData.expiryDate) data.append('expiryDate', formData.expiryDate);
+            if (formData.file) data.append('image', formData.file);
+
+            await noticeService.createNotice(data);
             setSuccess('Notice created successfully!');
-            setFormData({ title: '', description: '', category: 'Whole College', attachment: '' });
+            setFormData({ title: '', description: '', category: 'Whole College', deadline: '', expiryDate: '', file: null });
             fetchMyNotices();
             setTimeout(() => setSuccess(''), 3000);
         } catch (err) {
@@ -91,9 +99,19 @@ const Dashboard = () => {
                                     {CATEGORIES.map(cat => <option key={cat} value={cat}>{cat}</option>)}
                                 </select>
                             </div>
+                            <div className="form-group" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                <div>
+                                    <label className="form-label">Event Deadline</label>
+                                    <input type="date" className="form-input" value={formData.deadline} onChange={e => setFormData({ ...formData, deadline: e.target.value })} />
+                                </div>
+                                <div>
+                                    <label className="form-label">Archive After Date</label>
+                                    <input type="date" className="form-input" value={formData.expiryDate} onChange={e => setFormData({ ...formData, expiryDate: e.target.value })} />
+                                </div>
+                            </div>
                             <div className="form-group">
-                                <label className="form-label">Attachment URL (Optional)</label>
-                                <input type="url" className="form-input" value={formData.attachment} onChange={e => setFormData({ ...formData, attachment: e.target.value })} />
+                                <label className="form-label">Upload Poster (Image)</label>
+                                <input type="file" accept="image/*" className="form-input" onChange={e => setFormData({ ...formData, file: e.target.files[0] })} />
                             </div>
                             <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>Post Notice</button>
                         </form>

@@ -20,6 +20,9 @@ const noticeSchema = new mongoose.Schema(
             ref: 'User',
             required: true,
         },
+        deadline: {
+            type: Date,
+        },
         attachment: {
             type: String, // URL to the file
         },

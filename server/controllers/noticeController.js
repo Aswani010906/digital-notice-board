@@ -42,7 +42,13 @@ const getArchivedNotices = async (req, res) => {
 // @access  Private (Admin, Department, Club)
 const createNotice = async (req, res) => {
     try {
-        const { title, description, category, attachment, expiryDate } = req.body;
+        const { title, description, category, expiryDate, deadline } = req.body;
+        let attachment = req.body.attachment || '';
+
+        // If a file was uploaded, set the attachment URL to the local file path
+        if (req.file) {
+            attachment = `/uploads/${req.file.filename}`;
+        }
 
         const notice = new Notice({
             title,
@@ -50,6 +56,7 @@ const createNotice = async (req, res) => {
             category,
             attachment,
             expiryDate,
+            deadline,
             postedBy: req.user._id,
         });
 
@@ -65,7 +72,7 @@ const createNotice = async (req, res) => {
 // @access  Private (Owner or Admin)
 const updateNotice = async (req, res) => {
     try {
-        const { title, description, category, attachment, expiryDate, isArchived } = req.body;
+        const { title, description, category, expiryDate, deadline, isArchived } = req.body;
 
         const notice = await Notice.findById(req.params.id);
 
@@ -75,11 +82,19 @@ const updateNotice = async (req, res) => {
                 return res.status(403).json({ message: 'User not authorized to update this notice' });
             }
 
+            let attachment = notice.attachment;
+            if (req.file) {
+                attachment = `/uploads/${req.file.filename}`;
+            } else if (req.body.attachment !== undefined) {
+                attachment = req.body.attachment;
+            }
+
             notice.title = title || notice.title;
             notice.description = description || notice.description;
             notice.category = category || notice.category;
-            notice.attachment = attachment !== undefined ? attachment : notice.attachment;
+            notice.attachment = attachment;
             notice.expiryDate = expiryDate !== undefined ? expiryDate : notice.expiryDate;
+            notice.deadline = deadline !== undefined ? deadline : notice.deadline;
             if (isArchived !== undefined) notice.isArchived = isArchived;
 
             const updatedNotice = await notice.save();
