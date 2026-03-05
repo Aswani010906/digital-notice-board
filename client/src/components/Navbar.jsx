@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { authService } from '../services/api';
 import { Bell } from 'lucide-react';
 
@@ -21,19 +21,22 @@ const Navbar = () => {
                     </div>
                     <span style={{ color: 'var(--text-main)' }}>CollegeBoard</span>
                 </Link>
-                <div className="nav-links">
-                    <Link to="/" style={{ color: 'var(--text-muted)' }}>Home</Link>
-                    <Link to="/archive" style={{ color: 'var(--text-muted)' }}>Archive</Link>
+                <div className="nav-links" style={{ alignItems: 'center' }}>
+                    <NavLink to="/" style={({ isActive }) => ({ color: isActive ? 'var(--text-main)' : 'var(--text-muted)', fontWeight: isActive ? '700' : 'normal' })}>Home</NavLink>
+                    <NavLink to="/archive" style={({ isActive }) => ({ color: isActive ? 'var(--text-main)' : 'var(--text-muted)', fontWeight: isActive ? '700' : 'normal' })}>Archive</NavLink>
                     {user ? (
                         <>
                             {user.role === 'admin' && (
-                                <Link to="/admin/users" style={{ color: 'var(--text-main)', fontWeight: '500' }}>Admin Users</Link>
+                                <NavLink to="/admin/users" style={({ isActive }) => ({ color: isActive ? 'var(--text-main)' : 'var(--text-muted)', fontWeight: isActive ? '700' : '500' })}>Admin Users</NavLink>
                             )}
-                            <Link to="/dashboard" style={{ color: 'var(--text-main)', fontWeight: '500' }}>Dashboard</Link>
-                            <button className="btn btn-outline" onClick={handleLogout}>Logout</button>
+                            <NavLink to="/dashboard" style={({ isActive }) => ({ color: isActive ? 'var(--text-main)' : 'var(--text-muted)', fontWeight: isActive ? '700' : '500' })}>Dashboard</NavLink>
+                            <span style={{ marginLeft: '1rem', color: 'var(--text-main)', fontSize: '0.9rem', opacity: 0.8 }}>
+                                Welcome, <strong>{user.name}</strong>
+                            </span>
+                            <button className="btn btn-outline" onClick={handleLogout} style={{ marginLeft: '0.5rem' }}>Logout</button>
                         </>
                     ) : (
-                        <Link to="/login" className="btn btn-primary">Login / Admin</Link>
+                        <NavLink to="/login" className="btn btn-primary">Login / Admin</NavLink>
                     )}
                 </div>
             </div>
