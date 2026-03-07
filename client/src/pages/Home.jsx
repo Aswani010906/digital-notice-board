@@ -3,7 +3,7 @@ import { noticeService, authService } from '../services/api';
 import NoticeCard from '../components/NoticeCard';
 import { useNavigate } from 'react-router-dom';
 
-const CATEGORIES = ['CSE', 'ECE', 'EC', 'ME', 'CE', 'RAI', 'NSS', 'IEEE', 'Arts Club', 'Whole College'];
+const CATEGORIES = ['CSE', 'EEE', 'EC', 'ME', 'CE', 'RAI', 'NSS', 'IEEE', 'Arts Club', 'Whole College'];
 
 const Home = () => {
     const [notices, setNotices] = useState([]);

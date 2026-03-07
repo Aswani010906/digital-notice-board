@@ -7,7 +7,7 @@ const getCategories = async (req, res) => {
         if (categories.length === 0) {
             return res.json([
                 { name: 'CSE' },
-                { name: 'ECE' },
+                { name: 'EEE' },
                 { name: 'ME' },
                 { name: 'NSS' },
                 { name: 'IEEE' },

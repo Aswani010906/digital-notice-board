@@ -105,7 +105,7 @@ const UserManagement = () => {
                     >
                         <option value="" disabled>Select Department</option>
                         <option value="CSE">CSE</option>
-                        <option value="ECE">ECE</option>
+                        <option value="EEE">EEE</option>
                         <option value="EC">EC</option>
                         <option value="ME">ME</option>
                         <option value="CE">CE</option>
