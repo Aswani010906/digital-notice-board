@@ -868,6 +868,7 @@ a:hover {
   border: 1px dashed rgba(91, 124, 153, 0.35);
   border-radius: 14px;
   background: rgba(219, 231, 240, 0.22);
+  position: relative;
 }
 
 .dashboard-upload-wrap svg {
@@ -875,15 +876,61 @@ a:hover {
   flex-shrink: 0;
 }
 
+.dashboard-upload-wrap__icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 118, 110, 0.12);
+  flex-shrink: 0;
+}
+
+.dashboard-upload-wrap__copy {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 0.15rem;
+}
+
+.dashboard-upload-wrap__copy strong {
+  font-size: 0.94rem;
+}
+
+.dashboard-upload-wrap__copy span {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
 .dashboard-upload-wrap .form-input {
-  padding: 0;
-  border: none;
-  background: transparent;
-  box-shadow: none;
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
 }
 
 .dashboard-submit {
   width: 100%;
+}
+
+.dashboard-date-card {
+  padding: 1rem;
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(244, 249, 247, 0.9));
+  border: 1px solid rgba(255, 255, 255, 0.82);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82);
+}
+
+.dashboard-date-card .form-label {
+  margin-bottom: 0.25rem;
+}
+
+.dashboard-date-card__hint {
+  margin-bottom: 0.9rem;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  line-height: 1.5;
 }
 
 .dashboard-notice-list {
@@ -899,7 +946,9 @@ a:hover {
   gap: 1rem;
   padding: 1rem 1.1rem;
   border-radius: 18px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(247, 242, 234, 0.9));
+  background:
+    radial-gradient(circle at top right, rgba(15, 118, 110, 0.08), transparent 28%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(247, 242, 234, 0.9));
   border: 1px solid rgba(255, 255, 255, 0.84);
   box-shadow: 0 10px 24px rgba(23, 32, 51, 0.05);
 }
@@ -908,14 +957,48 @@ a:hover {
   margin-bottom: 0.3rem;
 }
 
-.dashboard-notice-row__copy p {
+.dashboard-notice-row__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
   color: var(--text-muted);
   font-size: 0.9rem;
 }
 
+.dashboard-notice-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.28rem 0.65rem;
+  border-radius: 999px;
+  background: rgba(15, 118, 110, 0.1);
+  color: var(--primary);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
 .dashboard-delete-btn {
-  padding: 0.65rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.7rem 0.95rem;
   flex-shrink: 0;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #f2d7d5, #e9cfc8);
+  color: #7a4d46;
+  box-shadow: 0 10px 18px rgba(122, 77, 70, 0.12);
+}
+
+.dashboard-delete-btn:hover {
+  background: linear-gradient(135deg, #f5e2df, #edd8d1);
+  color: #6c433d;
+  box-shadow: 0 14px 24px rgba(122, 77, 70, 0.16);
+}
+
+.dashboard-delete-btn span {
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
 }
 
 .dashboard-empty-state {

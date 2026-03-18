@@ -31,8 +31,7 @@ const Dashboard = () => {
     const fetchMyNotices = async () => {
         try {
             const data = await noticeService.getNotices();
-            // Filter my notices (or Admin sees all - simplistic approach here)
-            const myNotices = user.role === 'admin' ? data : data.filter(n => n.postedBy?._id === user._id);
+            const myNotices = data.filter(n => n.postedBy?._id === user._id);
             setNotices(myNotices);
         } catch (err) {
             console.error(err);
@@ -132,16 +131,24 @@ const Dashboard = () => {
                             <div className="form-group">
                                 <label className="form-label">Poster</label>
                                 <div className="dashboard-upload-wrap">
-                                    <ImagePlus size={18} />
+                                    <div className="dashboard-upload-wrap__icon">
+                                        <ImagePlus size={18} />
+                                    </div>
+                                    <div className="dashboard-upload-wrap__copy">
+                                        <strong>{formData.file ? formData.file.name : 'Upload poster image'}</strong>
+                                        <span>{formData.file ? 'Poster selected successfully' : 'PNG, JPG, JPEG, WEBP or GIF'}</span>
+                                    </div>
                                     <input type="file" accept="image/*" className="form-input" onChange={e => setFormData({ ...formData, file: e.target.files[0] })} />
                                 </div>
                             </div>
-                            <div className="form-group">
+                            <div className="dashboard-date-card">
                                 <label className="form-label">Event Deadline</label>
+                                <p className="dashboard-date-card__hint">Optional last date for an event or registration.</p>
                                 <input type="date" className="form-input" value={formData.deadline} onChange={e => setFormData({ ...formData, deadline: e.target.value })} />
                             </div>
-                            <div className="form-group">
+                            <div className="dashboard-date-card">
                                 <label className="form-label">Archive After Date</label>
+                                <p className="dashboard-date-card__hint">Move the notice to archive automatically after this date.</p>
                                 <input type="date" className="form-input" value={formData.expiryDate} onChange={e => setFormData({ ...formData, expiryDate: e.target.value })} />
                             </div>
                         </div>
@@ -169,9 +176,17 @@ const Dashboard = () => {
                             <div key={notice._id} className="dashboard-notice-row">
                                 <div className="dashboard-notice-row__copy">
                                     <h4>{notice.title}</h4>
-                                    <p>{notice.category}</p>
+                                    <div className="dashboard-notice-row__meta">
+                                        <span className="dashboard-notice-chip">{notice.category}</span>
+                                        <span>{new Date(notice.createdAt).toLocaleDateString('en-US', {
+                                            day: 'numeric',
+                                            month: 'short',
+                                            year: 'numeric'
+                                        })}</span>
+                                    </div>
                                 </div>
                                 <button onClick={() => handleDelete(notice._id)} className="btn btn-danger dashboard-delete-btn">
+                                    <span>Delete</span>
                                     <Trash2 size={16} />
                                 </button>
                             </div>

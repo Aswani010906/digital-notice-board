@@ -69,7 +69,7 @@ const createNotice = async (req, res) => {
 
 // @desc    Update a notice
 // @route   PUT /api/notices/:id
-// @access  Private (Owner or Admin)
+// @access  Private (Owner only)
 const updateNotice = async (req, res) => {
     try {
         const { title, description, category, expiryDate, deadline, isArchived } = req.body;
@@ -77,8 +77,8 @@ const updateNotice = async (req, res) => {
         const notice = await Notice.findById(req.params.id);
 
         if (notice) {
-            // Check if user is owner or admin
-            if (notice.postedBy.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+            // Only the creator can update their notice
+            if (notice.postedBy.toString() !== req.user._id.toString()) {
                 return res.status(403).json({ message: 'User not authorized to update this notice' });
             }
 
@@ -109,14 +109,14 @@ const updateNotice = async (req, res) => {
 
 // @desc    Delete a notice
 // @route   DELETE /api/notices/:id
-// @access  Private (Owner or Admin)
+// @access  Private (Owner only)
 const deleteNotice = async (req, res) => {
     try {
         const notice = await Notice.findById(req.params.id);
 
         if (notice) {
-            // Check if user is owner or admin
-            if (notice.postedBy.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+            // Only the creator can delete their notice
+            if (notice.postedBy.toString() !== req.user._id.toString()) {
                 return res.status(403).json({ message: 'User not authorized to delete this notice' });
             }
 
