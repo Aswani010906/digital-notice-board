@@ -36,20 +36,22 @@ const Home = () => {
 
     return (
         <div className="container main-content">
-            <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+            <div style={{ position: 'relative', marginBottom: '3rem' }}>
+                {user?.role === 'student' && (
+                    <div style={{ position: 'absolute', top: 0, right: 0 }}>
+                        <div className="btn btn-outline" style={{ cursor: 'default', fontWeight: '700', padding: '0.75rem 1.4rem' }}>
+                            Role: Student
+                        </div>
+                    </div>
+                )}
+
+                <div style={{ textAlign: 'center' }}>
                 <h1 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>College Digital Notice Board</h1>
                 <p style={{ color: 'var(--text-muted)', fontSize: '1.2rem', maxWidth: '600px', margin: '0 auto' }}>
                     Stay updated with the latest announcements, events, and important notices from all departments and clubs.
                 </p>
-            </div>
-
-            {user?.role === 'student' && (
-                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '2rem' }}>
-                    <div className="btn btn-outline" style={{ cursor: 'default', fontWeight: '700', padding: '0.75rem 1.4rem' }}>
-                        Role: Student
-                    </div>
                 </div>
-            )}
+            </div>
 
             <div style={{ marginBottom: '2rem' }}>
                 <h3 style={{ marginBottom: '1rem' }}>Filter by Category</h3>
