@@ -46,8 +46,10 @@ const UserManagement = () => {
             setSuccess('User created successfully!');
             setFormData({ name: '', email: '', password: '', role: 'student', department: '' });
             fetchUsers();
+            setTimeout(() => setSuccess(null), 3000);
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to create user');
+            setTimeout(() => setError(null), 3000);
         } finally {
             setLoading(false);
         }
@@ -73,6 +75,13 @@ const UserManagement = () => {
 
     return (
         <div className="container main-content">
+            {(error || success) && (
+                <div className="app-toast-stack">
+                    {error && <div className="app-toast app-toast--error">{error}</div>}
+                    {success && <div className="app-toast app-toast--success">{success}</div>}
+                </div>
+            )}
+
             <section className="admin-users-hero">
                 <div className="admin-users-hero__badge">
                     <ShieldCheck size={16} />
@@ -106,9 +115,6 @@ const UserManagement = () => {
                             <p>Create accounts for students, admins, departments, and clubs.</p>
                         </div>
                     </div>
-
-                    {error && <div className="admin-users-alert admin-users-alert--error">{error}</div>}
-                    {success && <div className="admin-users-alert admin-users-alert--success">{success}</div>}
 
                     <form onSubmit={handleSubmit} className="admin-users-form">
                         <div className="admin-users-form__grid">

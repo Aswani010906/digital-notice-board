@@ -11,6 +11,8 @@ const Dashboard = () => {
     const [formData, setFormData] = useState({ title: '', description: '', category: 'Whole College', deadline: '', expiryDate: '', file: null });
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const [noticeToDelete, setNoticeToDelete] = useState(null);
+    const [isDeleting, setIsDeleting] = useState(false);
     const navigate = useNavigate();
     const user = authService.getCurrentUser();
 
@@ -62,19 +64,33 @@ const Dashboard = () => {
         }
     };
 
-    const handleDelete = async (id) => {
-        if (window.confirm('Are you sure you want to delete this notice?')) {
-            try {
-                await noticeService.deleteNotice(id);
-                fetchMyNotices();
-            } catch (err) {
-                alert('Failed to delete notice: ' + (err.response?.data?.message || err.message));
-            }
+    const handleDelete = async () => {
+        if (!noticeToDelete) return;
+
+        setIsDeleting(true);
+        try {
+            await noticeService.deleteNotice(noticeToDelete._id);
+            setSuccess('Notice deleted successfully.');
+            setNoticeToDelete(null);
+            fetchMyNotices();
+            setTimeout(() => setSuccess(''), 3000);
+        } catch (err) {
+            setError('Failed to delete notice: ' + (err.response?.data?.message || err.message));
+            setTimeout(() => setError(''), 3000);
+        } finally {
+            setIsDeleting(false);
         }
     };
 
     return (
         <div className="container main-content">
+            {(error || success) && (
+                <div className="app-toast-stack">
+                    {error && <div className="app-toast app-toast--error">{error}</div>}
+                    {success && <div className="app-toast app-toast--success">{success}</div>}
+                </div>
+            )}
+
             <section className="page-hero">
                 <div className="page-hero__badge">
                     <ShieldCheck size={16} />
@@ -108,9 +124,6 @@ const Dashboard = () => {
                             <p>Create a fresh announcement with optional dates and poster upload.</p>
                         </div>
                     </div>
-
-                    {error && <div className="dashboard-alert dashboard-alert--error">{error}</div>}
-                    {success && <div className="dashboard-alert dashboard-alert--success">{success}</div>}
 
                     <form onSubmit={handleCreate} className="dashboard-form">
                         <div className="dashboard-form__grid">
@@ -185,7 +198,7 @@ const Dashboard = () => {
                                         })}</span>
                                     </div>
                                 </div>
-                                <button onClick={() => handleDelete(notice._id)} className="btn btn-danger dashboard-delete-btn">
+                                <button onClick={() => setNoticeToDelete(notice)} className="btn btn-danger dashboard-delete-btn">
                                     <span>Delete</span>
                                     <Trash2 size={16} />
                                 </button>
@@ -194,6 +207,38 @@ const Dashboard = () => {
                     </div>
                 </section>
             </div>
+
+            {noticeToDelete && (
+                <div className="notice-modal-backdrop" onClick={() => !isDeleting && setNoticeToDelete(null)}>
+                    <div className="dashboard-delete-modal" onClick={(e) => e.stopPropagation()}>
+                        <div className="dashboard-delete-modal__icon">
+                            <Trash2 size={20} />
+                        </div>
+                        <h3>Delete this notice?</h3>
+                        <p>
+                            This will remove <strong>{noticeToDelete.title}</strong> from the notice board.
+                        </p>
+                        <div className="dashboard-delete-modal__actions">
+                            <button
+                                type="button"
+                                className="btn btn-outline"
+                                onClick={() => setNoticeToDelete(null)}
+                                disabled={isDeleting}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="button"
+                                className="btn dashboard-delete-modal__confirm"
+                                onClick={handleDelete}
+                                disabled={isDeleting}
+                            >
+                                {isDeleting ? 'Deleting...' : 'Delete Notice'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
