@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { userService } from '../services/api';
-import { ShieldCheck, Users, UserPlus } from 'lucide-react';
+import { Search, ShieldCheck, UserPlus, Users } from 'lucide-react';
 
 const UserManagement = () => {
     const [users, setUsers] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [searchResult, setSearchResult] = useState(null);
+    const [hasSearched, setHasSearched] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -48,6 +51,24 @@ const UserManagement = () => {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleSearch = (e) => {
+        e.preventDefault();
+        const query = searchTerm.trim().toLowerCase();
+        if (!query) {
+            setSearchResult(null);
+            setHasSearched(false);
+            return;
+        }
+
+        const match = users.find((user) =>
+            user.name?.toLowerCase().includes(query) ||
+            user.email?.toLowerCase().includes(query)
+        );
+
+        setSearchResult(match || null);
+        setHasSearched(true);
     };
 
     return (
@@ -168,47 +189,42 @@ const UserManagement = () => {
                     </form>
                 </section>
 
-                <section className="card admin-users-table-card">
-                    <div className="admin-users-panel__head admin-users-panel__head--table">
+                <section className="card admin-users-search-card">
+                    <div className="admin-users-panel__head">
+                        <div className="admin-users-panel__icon">
+                            <Search size={18} />
+                        </div>
                         <div>
-                            <h2>Existing Users</h2>
-                            <p>A quick view of all registered users on the platform.</p>
+                            <h2>Search User</h2>
+                            <p>Check whether a particular user exists by name or email.</p>
                         </div>
                     </div>
 
-                    <div className="admin-users-table-wrap">
-                        <table className="admin-users-table">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                    <th>Role</th>
-                                    <th>Department</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {users.map((user) => (
-                                    <tr key={user._id}>
-                                        <td>
-                                            <div className="admin-users-name-cell">
-                                                <div className="admin-users-avatar">
-                                                    {user.name?.charAt(0)?.toUpperCase() || 'U'}
-                                                </div>
-                                                <span>{user.name}</span>
-                                            </div>
-                                        </td>
-                                        <td>{user.email}</td>
-                                        <td>
-                                            <span className="admin-users-role-pill">
-                                                {user.role}
-                                            </span>
-                                        </td>
-                                        <td>{user.department || '-'}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+                    <form onSubmit={handleSearch} className="admin-users-search-form">
+                        <input
+                            type="text"
+                            className="form-input"
+                            placeholder="Enter name or email"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                        <button type="submit" className="btn btn-primary">Search</button>
+                    </form>
+
+                    {hasSearched && (
+                        searchResult ? (
+                            <div className="admin-user-search-result admin-user-search-result--found">
+                                <strong>User found</strong>
+                                <span>{searchResult.name} • {searchResult.email}</span>
+                                <span>Role: {searchResult.role}{searchResult.department ? ` • Department: ${searchResult.department}` : ''}</span>
+                            </div>
+                        ) : (
+                            <div className="admin-user-search-result admin-user-search-result--missing">
+                                <strong>User not found</strong>
+                                <span>No matching user exists for the entered name or email.</span>
+                            </div>
+                        )
+                    )}
                 </section>
             </div>
         </div>
