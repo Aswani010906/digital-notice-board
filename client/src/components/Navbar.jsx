@@ -6,6 +6,7 @@ import { Bell } from 'lucide-react';
 const Navbar = () => {
     const navigate = useNavigate();
     const user = authService.getCurrentUser();
+    const homeLink = user ? (user.role === 'student' ? '/notices' : '/dashboard') : '/login';
 
     const handleLogout = () => {
         authService.logout();
@@ -15,21 +16,23 @@ const Navbar = () => {
     return (
         <nav className="navbar">
             <div className="container navbar-inner">
-                <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.25rem', fontWeight: 'bold' }}>
+                <Link to={homeLink} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.25rem', fontWeight: 'bold' }}>
                     <div style={{ background: 'var(--primary)', color: 'white', padding: '0.5rem', borderRadius: '8px', display: 'flex' }}>
                         <Bell size={20} />
                     </div>
                     <span style={{ color: 'var(--text-main)' }}>CollegeBoard</span>
                 </Link>
                 <div className="nav-links" style={{ alignItems: 'center' }}>
-                    <NavLink to="/" style={({ isActive }) => ({ color: isActive ? 'var(--text-main)' : 'var(--text-muted)', fontWeight: isActive ? '700' : 'normal' })}>Home</NavLink>
-                    <NavLink to="/archive" style={({ isActive }) => ({ color: isActive ? 'var(--text-main)' : 'var(--text-muted)', fontWeight: isActive ? '700' : 'normal' })}>Archive</NavLink>
                     {user ? (
                         <>
+                            <NavLink to="/notices" style={({ isActive }) => ({ color: isActive ? 'var(--text-main)' : 'var(--text-muted)', fontWeight: isActive ? '700' : 'normal' })}>Notices</NavLink>
+                            <NavLink to="/archive" style={({ isActive }) => ({ color: isActive ? 'var(--text-main)' : 'var(--text-muted)', fontWeight: isActive ? '700' : 'normal' })}>Archive</NavLink>
                             {user.role === 'admin' && (
                                 <NavLink to="/admin/users" style={({ isActive }) => ({ color: isActive ? 'var(--text-main)' : 'var(--text-muted)', fontWeight: isActive ? '700' : '500' })}>Admin Users</NavLink>
                             )}
-                            <NavLink to="/dashboard" style={({ isActive }) => ({ color: isActive ? 'var(--text-main)' : 'var(--text-muted)', fontWeight: isActive ? '700' : '500' })}>Dashboard</NavLink>
+                            {user.role !== 'student' && (
+                                <NavLink to="/dashboard" style={({ isActive }) => ({ color: isActive ? 'var(--text-main)' : 'var(--text-muted)', fontWeight: isActive ? '700' : '500' })}>Dashboard</NavLink>
+                            )}
                             <span style={{ marginLeft: '1rem', color: 'var(--text-main)', fontSize: '0.9rem', opacity: 0.8 }}>
                                 Welcome, <strong>{user.name}</strong>
                             </span>

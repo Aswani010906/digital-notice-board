@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { authService } from '../services/api';
 import { useNavigate } from 'react-router-dom';
+import { BellRing, ShieldCheck, Sparkles } from 'lucide-react';
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -19,8 +20,8 @@ const Login = () => {
         setError('');
 
         try {
-            await authService.login({ email, password });
-            navigate('/dashboard');
+            const user = await authService.login({ email, password });
+            navigate(user.role === 'student' ? '/notices' : '/dashboard');
         } catch (err) {
             setError(err.response?.data?.message || 'Login failed. Please try again.');
         } finally {
@@ -29,48 +30,78 @@ const Login = () => {
     };
 
     return (
-        <div className="container main-content" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            <div className="card" style={{ width: '100%', maxWidth: '400px', padding: '2rem' }}>
-                <h2 style={{ textAlign: 'center', marginBottom: '1.5rem' }}>Staff/Admin Login</h2>
+        <section className="login-shell">
+            <div className="login-backdrop login-backdrop-one"></div>
+            <div className="login-backdrop login-backdrop-two"></div>
 
-                {error && (
-                    <div style={{ background: '#FEE2E2', color: '#B91C1C', padding: '0.75rem', borderRadius: '8px', marginBottom: '1rem', fontSize: '0.875rem' }}>
-                        {error}
+            <div className="login-layout">
+                <div className="login-hero">
+                    <div className="login-chip">
+                        <BellRing size={16} />
+                        <span>College Notice Board</span>
                     </div>
-                )}
 
-                <form onSubmit={handleLogin}>
-                    <div className="form-group">
-                        <label className="form-label">Email Address</label>
-                        <input
-                            type="email"
-                            className="form-input"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            placeholder="admin@college.edu"
-                        />
+                    <h1>College Notice Board</h1>
+                    <p>
+                        A focused digital space for official updates, staff coordination, and campus communication.
+                    </p>
+
+                    <div className="login-feature-list">
+                        <div className="login-feature-item">
+                            <Sparkles size={18} />
+                            <span>Clean, modern access for admins and staff</span>
+                        </div>
+                        <div className="login-feature-item">
+                            <ShieldCheck size={18} />
+                            <span>Secure sign-in before notices and management tools appear</span>
+                        </div>
                     </div>
-                    <div className="form-group">
-                        <label className="form-label">Password</label>
-                        <input
-                            type="password"
-                            className="form-input"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            placeholder="••••••••"
-                        />
+                </div>
+
+                <div className="login-panel">
+                    <div className="login-card">
+                        <h2>Staff/Admin Login</h2>
+                        <p className="login-subtitle">Sign in to manage notices, categories, and users.</p>
+
+                        {error && (
+                            <div className="login-error">
+                                {error}
+                            </div>
+                        )}
+
+                        <form onSubmit={handleLogin}>
+                            <div className="form-group">
+                                <label className="form-label">Email Address</label>
+                                <input
+                                    type="email"
+                                    className="form-input"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    placeholder="admin@college.edu"
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Password</label>
+                                <input
+                                    type="password"
+                                    className="form-input"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    placeholder="Enter your password"
+                                />
+                            </div>
+                            <button
+                                type="submit"
+                                className="btn btn-primary login-submit"
+                                disabled={loading}
+                            >
+                                {loading ? 'Signing in...' : 'Sign In'}
+                            </button>
+                        </form>
                     </div>
-                    <button
-                        type="submit"
-                        className="btn btn-primary"
-                        style={{ width: '100%' }}
-                        disabled={loading}
-                    >
-                        {loading ? 'Signing in...' : 'Sign In'}
-                    </button>
-                </form>
+                </div>
             </div>
-        </div>
+        </section>
     );
 };
 
