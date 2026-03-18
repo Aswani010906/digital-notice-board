@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { noticeService, authService } from '../services/api';
 import { useNavigate } from 'react-router-dom';
-import { Trash2 } from 'lucide-react';
+import { ClipboardList, FilePlus2, ImagePlus, ShieldCheck, Trash2 } from 'lucide-react';
 
 const CATEGORIES = ['Whole College', 'CSE', 'EEE', 'EC', 'ME', 'CE', 'RAI', 'IEEE', 'ISTE', 'TinkerHub', 'NSS', 'Arts Club'];
 
@@ -76,68 +76,108 @@ const Dashboard = () => {
 
     return (
         <div className="container main-content">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                <h1>Dashboard</h1>
-                <span className="btn btn-outline" style={{ cursor: 'default' }}>Role: {user.role.toUpperCase()}</span>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2">
-                {/* Create Form or Student Welcome */}
-                <div className="card" style={{ padding: '1.5rem', height: 'fit-content' }}>
-                    <h2 style={{ marginBottom: '1.5rem' }}>Post New Notice</h2>
-                    {error && <div style={{ color: 'red', marginBottom: '1rem' }}>{error}</div>}
-                    {success && <div style={{ color: 'green', marginBottom: '1rem' }}>{success}</div>}
-
-                    <form onSubmit={handleCreate}>
-                        <div className="form-group">
-                            <label className="form-label">Title</label>
-                            <input type="text" className="form-input" required value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} />
-                        </div>
-                        <div className="form-group">
-                            <label className="form-label">Description</label>
-                            <textarea className="form-input" required rows="4" value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })}></textarea>
-                        </div>
-                        <div className="form-group">
-                            <label className="form-label">Category</label>
-                            <select className="form-input" value={formData.category} onChange={e => setFormData({ ...formData, category: e.target.value })}>
-                                {CATEGORIES.map(cat => <option key={cat} value={cat}>{cat}</option>)}
-                            </select>
-                        </div>
-                        <div className="form-group" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <section className="page-hero">
+                <div className="page-hero__badge">
+                    <ShieldCheck size={16} />
+                    <span>{user.role.toUpperCase()} PANEL</span>
+                </div>
+                <div className="page-hero__header">
+                    <div>
+                        <h1>Dashboard</h1>
+                        <p>Create, organize, and manage the notices you publish across the college board.</p>
+                    </div>
+                    <div className="page-hero__stats">
+                        <div className="page-hero-stat">
+                            <ClipboardList size={18} />
                             <div>
+                                <strong>{notices.length}</strong>
+                                <span>Managed Notices</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div className="dashboard-layout">
+                <section className="card dashboard-panel dashboard-panel--form">
+                    <div className="dashboard-panel__head">
+                        <div className="dashboard-panel__icon">
+                            <FilePlus2 size={18} />
+                        </div>
+                        <div>
+                            <h2>Post New Notice</h2>
+                            <p>Create a fresh announcement with optional dates and poster upload.</p>
+                        </div>
+                    </div>
+
+                    {error && <div className="dashboard-alert dashboard-alert--error">{error}</div>}
+                    {success && <div className="dashboard-alert dashboard-alert--success">{success}</div>}
+
+                    <form onSubmit={handleCreate} className="dashboard-form">
+                        <div className="dashboard-form__grid">
+                            <div className="form-group dashboard-form__full">
+                                <label className="form-label">Title</label>
+                                <input type="text" className="form-input" required value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} />
+                            </div>
+                            <div className="form-group dashboard-form__full">
+                                <label className="form-label">Description</label>
+                                <textarea className="form-input dashboard-textarea" required rows="5" value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })}></textarea>
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Category</label>
+                                <select className="form-input" value={formData.category} onChange={e => setFormData({ ...formData, category: e.target.value })}>
+                                    {CATEGORIES.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                                </select>
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Poster</label>
+                                <div className="dashboard-upload-wrap">
+                                    <ImagePlus size={18} />
+                                    <input type="file" accept="image/*" className="form-input" onChange={e => setFormData({ ...formData, file: e.target.files[0] })} />
+                                </div>
+                            </div>
+                            <div className="form-group">
                                 <label className="form-label">Event Deadline</label>
                                 <input type="date" className="form-input" value={formData.deadline} onChange={e => setFormData({ ...formData, deadline: e.target.value })} />
                             </div>
-                            <div>
+                            <div className="form-group">
                                 <label className="form-label">Archive After Date</label>
                                 <input type="date" className="form-input" value={formData.expiryDate} onChange={e => setFormData({ ...formData, expiryDate: e.target.value })} />
                             </div>
                         </div>
-                        <div className="form-group">
-                            <label className="form-label">Upload Poster (Image)</label>
-                            <input type="file" accept="image/*" className="form-input" onChange={e => setFormData({ ...formData, file: e.target.files[0] })} />
-                        </div>
-                        <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>Post Notice</button>
+                        <button type="submit" className="btn btn-primary dashboard-submit">Post Notice</button>
                     </form>
-                </div>
+                </section>
 
-                {/* Existing Notices List */}
-                <div>
-                    <h2 style={{ marginBottom: '1.5rem' }}>Manage Notices</h2>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                        {loading ? <p>Loading...</p> : notices.length === 0 ? <p>No notices posted by you yet.</p> : notices.map(notice => (
-                            <div key={notice._id} className="card" style={{ padding: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <div>
-                                    <h4 style={{ marginBottom: '0.25rem' }}>{notice.title}</h4>
-                                    <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>{notice.category}</p>
+                <section className="card dashboard-panel dashboard-panel--list">
+                    <div className="dashboard-panel__head">
+                        <div className="dashboard-panel__icon">
+                            <ClipboardList size={18} />
+                        </div>
+                        <div>
+                            <h2>Manage Notices</h2>
+                            <p>Quickly review and remove notices you have already published.</p>
+                        </div>
+                    </div>
+
+                    <div className="dashboard-notice-list">
+                        {loading ? (
+                            <p>Loading...</p>
+                        ) : notices.length === 0 ? (
+                            <div className="dashboard-empty-state">No notices posted by you yet.</div>
+                        ) : notices.map(notice => (
+                            <div key={notice._id} className="dashboard-notice-row">
+                                <div className="dashboard-notice-row__copy">
+                                    <h4>{notice.title}</h4>
+                                    <p>{notice.category}</p>
                                 </div>
-                                <button onClick={() => handleDelete(notice._id)} className="btn btn-danger" style={{ padding: '0.5rem' }}>
+                                <button onClick={() => handleDelete(notice._id)} className="btn btn-danger dashboard-delete-btn">
                                     <Trash2 size={16} />
                                 </button>
                             </div>
                         ))}
                     </div>
-                </div>
+                </section>
             </div>
         </div>
     );

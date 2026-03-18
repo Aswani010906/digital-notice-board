@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { noticeService } from '../services/api';
 import NoticeCard from '../components/NoticeCard';
+import { Archive, Clock3 } from 'lucide-react';
 
 const ArchivePage = () => {
     const [notices, setNotices] = useState([]);
@@ -23,10 +24,27 @@ const ArchivePage = () => {
 
     return (
         <div className="container main-content">
-            <div style={{ marginBottom: '2rem' }}>
-                <h1>Notice Archive</h1>
-                <p style={{ color: 'var(--text-muted)' }}>Past and expired notices.</p>
-            </div>
+            <section className="page-hero">
+                <div className="page-hero__badge">
+                    <Archive size={16} />
+                    <span>Archive</span>
+                </div>
+                <div className="page-hero__header">
+                    <div>
+                        <h1>Notice Archive</h1>
+                        <p>Browse past and expired notices that have moved out of the active board.</p>
+                    </div>
+                    <div className="page-hero__stats">
+                        <div className="page-hero-stat">
+                            <Clock3 size={18} />
+                            <div>
+                                <strong>{notices.length}</strong>
+                                <span>Archived Notices</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
             {loading ? (
                 <p>Loading archive...</p>

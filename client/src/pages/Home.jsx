@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { noticeService, authService } from '../services/api';
 import NoticeCard from '../components/NoticeCard';
 import { useNavigate } from 'react-router-dom';
+import { BellRing, LayoutList } from 'lucide-react';
 
 const CATEGORIES = ['Whole College', 'CSE', 'EEE', 'EC', 'ME', 'CE', 'RAI', 'IEEE', 'ISTE', 'TinkerHub', 'NSS', 'Arts Club'];
 const SOCIETY_CATEGORIES = ['IEEE', 'ISTE', 'TinkerHub', 'NSS', 'Arts Club'];
@@ -119,14 +120,29 @@ const Home = () => {
                 </div>
             ) : (
                 <>
-                    <div style={{ position: 'relative', marginBottom: '3rem' }}>
-                        <div style={{ textAlign: 'center' }}>
-                            <h1 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>College Digital Notice Board</h1>
-                            <p style={{ color: 'var(--text-muted)', fontSize: '1.2rem', maxWidth: '600px', margin: '0 auto' }}>
-                                Stay updated with the latest announcements, events, and important notices from all departments and clubs.
-                            </p>
+                    <section className="page-hero">
+                        <div className="page-hero__badge">
+                            <BellRing size={16} />
+                            <span>Notice Board</span>
                         </div>
-                    </div>
+                        <div className="page-hero__header">
+                            <div>
+                                <h1>College Digital Notice Board</h1>
+                                <p>
+                                    Stay updated with the latest announcements, events, and important notices from all departments and clubs.
+                                </p>
+                            </div>
+                            <div className="page-hero__stats">
+                                <div className="page-hero-stat">
+                                    <LayoutList size={18} />
+                                    <div>
+                                        <strong>{notices.length}</strong>
+                                        <span>Active Notices</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
 
                     <div style={{ marginBottom: '2rem' }}>
                         <h3 style={{ marginBottom: '1rem' }}>Filter by Category</h3>
