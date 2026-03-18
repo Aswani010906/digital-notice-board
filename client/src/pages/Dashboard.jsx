@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { noticeService, authService } from '../services/api';
 import { useNavigate } from 'react-router-dom';
 import { ClipboardList, FilePlus2, ImagePlus, ShieldCheck, Trash2 } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
 
 const CATEGORIES = ['Whole College', 'CSE', 'EEE', 'EC', 'ME', 'CE', 'RAI', 'IEEE', 'ISTE', 'IEDC', 'TinkerHub', 'NSS', 'Sports', 'Arts Club'];
 
@@ -91,7 +92,7 @@ const Dashboard = () => {
                 </div>
             )}
 
-            <section className="page-hero">
+            <motion.section className="page-hero" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }}>
                 <div className="page-hero__badge">
                     <ShieldCheck size={16} />
                     <span>{user.role.toUpperCase()} PANEL</span>
@@ -111,10 +112,10 @@ const Dashboard = () => {
                         </div>
                     </div>
                 </div>
-            </section>
+            </motion.section>
 
             <div className="dashboard-layout">
-                <section className="card dashboard-panel dashboard-panel--form">
+                <motion.section className="card dashboard-panel dashboard-panel--form" initial={{ opacity: 0, y: 26 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08, duration: 0.45 }}>
                     <div className="dashboard-panel__head">
                         <div className="dashboard-panel__icon">
                             <FilePlus2 size={18} />
@@ -167,9 +168,9 @@ const Dashboard = () => {
                         </div>
                         <button type="submit" className="btn btn-primary dashboard-submit">Post Notice</button>
                     </form>
-                </section>
+                </motion.section>
 
-                <section className="card dashboard-panel dashboard-panel--list">
+                <motion.section className="card dashboard-panel dashboard-panel--list" initial={{ opacity: 0, y: 26 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.14, duration: 0.45 }}>
                     <div className="dashboard-panel__head">
                         <div className="dashboard-panel__icon">
                             <ClipboardList size={18} />
@@ -186,7 +187,7 @@ const Dashboard = () => {
                         ) : notices.length === 0 ? (
                             <div className="dashboard-empty-state">No notices posted by you yet.</div>
                         ) : notices.map(notice => (
-                            <div key={notice._id} className="dashboard-notice-row">
+                            <motion.div key={notice._id} className="dashboard-notice-row" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
                                 <div className="dashboard-notice-row__copy">
                                     <h4>{notice.title}</h4>
                                     <div className="dashboard-notice-row__meta">
@@ -202,15 +203,16 @@ const Dashboard = () => {
                                     <span>Delete</span>
                                     <Trash2 size={16} />
                                 </button>
-                            </div>
+                            </motion.div>
                         ))}
                     </div>
-                </section>
+                </motion.section>
             </div>
 
+            <AnimatePresence>
             {noticeToDelete && (
-                <div className="notice-modal-backdrop" onClick={() => !isDeleting && setNoticeToDelete(null)}>
-                    <div className="dashboard-delete-modal" onClick={(e) => e.stopPropagation()}>
+                <motion.div className="notice-modal-backdrop" onClick={() => !isDeleting && setNoticeToDelete(null)} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                    <motion.div className="dashboard-delete-modal" onClick={(e) => e.stopPropagation()} initial={{ opacity: 0, y: 24, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 18, scale: 0.97 }} transition={{ duration: 0.28 }}>
                         <div className="dashboard-delete-modal__icon">
                             <Trash2 size={20} />
                         </div>
@@ -236,9 +238,10 @@ const Dashboard = () => {
                                 {isDeleting ? 'Deleting...' : 'Delete Notice'}
                             </button>
                         </div>
-                    </div>
-                </div>
+                    </motion.div>
+                </motion.div>
             )}
+            </AnimatePresence>
         </div>
     );
 };

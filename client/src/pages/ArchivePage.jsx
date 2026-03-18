@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { noticeService } from '../services/api';
 import NoticeCard from '../components/NoticeCard';
 import { Archive, Clock3 } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const ArchivePage = () => {
     const [notices, setNotices] = useState([]);
@@ -24,7 +25,7 @@ const ArchivePage = () => {
 
     return (
         <div className="container main-content">
-            <section className="page-hero">
+            <motion.section className="page-hero" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }}>
                 <div className="page-hero__badge">
                     <Archive size={16} />
                     <span>Archive</span>
@@ -44,20 +45,20 @@ const ArchivePage = () => {
                         </div>
                     </div>
                 </div>
-            </section>
+            </motion.section>
 
             {loading ? (
-                <p>Loading archive...</p>
+                <div className="category-page-state">Loading archive...</div>
             ) : notices.length === 0 ? (
-                <div className="card" style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+                <div className="student-empty-state category-page-state">
                     No archived notices found.
                 </div>
             ) : (
-                <div className="grid grid-cols-1 grid-cols-2 lg:grid-cols-3">
+                <motion.div className="grid grid-cols-1 grid-cols-2 lg:grid-cols-3" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08, duration: 0.45 }}>
                     {notices.map(notice => (
                         <NoticeCard key={notice._id} notice={notice} />
                     ))}
-                </div>
+                </motion.div>
             )}
         </div>
     );

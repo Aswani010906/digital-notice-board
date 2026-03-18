@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { userService } from '../services/api';
 import { Search, ShieldCheck, UserPlus, Users } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const UserManagement = () => {
     const [users, setUsers] = useState([]);
@@ -82,7 +83,7 @@ const UserManagement = () => {
                 </div>
             )}
 
-            <section className="admin-users-hero">
+            <motion.section className="admin-users-hero" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }}>
                 <div className="admin-users-hero__badge">
                     <ShieldCheck size={16} />
                     <span>Admin Access</span>
@@ -102,10 +103,10 @@ const UserManagement = () => {
                         </div>
                     </div>
                 </div>
-            </section>
+            </motion.section>
 
             <div className="admin-users-layout">
-                <section className="card admin-users-panel">
+                <motion.section className="card admin-users-panel" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08, duration: 0.45 }}>
                     <div className="admin-users-panel__head">
                         <div className="admin-users-panel__icon">
                             <UserPlus size={18} />
@@ -193,9 +194,9 @@ const UserManagement = () => {
                             {loading ? 'Creating...' : 'Create User'}
                         </button>
                     </form>
-                </section>
+                </motion.section>
 
-                <section className="card admin-users-search-card">
+                <motion.section className="card admin-users-search-card" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.14, duration: 0.45 }}>
                     <div className="admin-users-panel__head">
                         <div className="admin-users-panel__icon">
                             <Search size={18} />
@@ -231,7 +232,7 @@ const UserManagement = () => {
                             </div>
                         )
                     )}
-                </section>
+                </motion.section>
             </div>
         </div>
     );

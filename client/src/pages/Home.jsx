@@ -3,17 +3,18 @@ import { noticeService, authService } from '../services/api';
 import NoticeCard from '../components/NoticeCard';
 import { useNavigate } from 'react-router-dom';
 import { BellRing, ChevronDown, ChevronUp, LayoutList } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const CATEGORIES = ['Whole College', 'CSE', 'EEE', 'EC', 'ME', 'CE', 'RAI', 'IEEE', 'ISTE', 'IEDC', 'TinkerHub', 'NSS', 'Sports', 'Arts Club'];
 const SOCIETY_CATEGORIES = ['IEEE', 'ISTE', 'IEDC', 'TinkerHub', 'NSS', 'Sports', 'Arts Club'];
 const CATEGORY_DISPLAY_NAMES = {
     'Whole College': 'Whole College',
-    CSE: 'Computer Science and Engineering',
-    EEE: 'Electrical and Electronics Engineering',
-    EC: 'Electronics and Communication Engineering',
-    ME: 'Mechanical Engineering',
-    CE: 'Civil Engineering',
-    RAI: 'Robotics and Artificial Intelligence',
+    CSE: 'Computer Science Department',
+    EEE: 'Electrical and Electronics Department',
+    EC: 'Electronics and Communication Department',
+    ME: 'Mechanical Department',
+    CE: 'Civil Department',
+    RAI: 'Robotics and Artificial Intelligence Department',
     IEEE: 'Institute of Electrical and Electronics Engineers',
     ISTE: 'Indian Society for Technical Education',
     IEDC: 'Innovation and Entrepreneurship Development Centre',
@@ -57,7 +58,13 @@ const Home = () => {
     const visibleAdminNotices = showAllNotices ? notices : notices.slice(0, initialNoticeCount);
 
     const renderNoticeSection = (title, items, emptyText) => (
-        <section className="student-notice-section">
+        <motion.section
+            className="student-notice-section"
+            initial={{ opacity: 0, y: 22 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.15 }}
+            transition={{ duration: 0.45 }}
+        >
             <div className="student-notice-section__header">
                 <h2>{title}</h2>
             </div>
@@ -72,44 +79,49 @@ const Home = () => {
                     ))}
                 </div>
             )}
-        </section>
+        </motion.section>
     );
 
     return (
         <div className="container main-content">
             {isStudent ? (
                 <div className="student-dashboard-shell">
-                    <aside className="student-sidebar">
-                        <div className="student-sidebar__top">
+                    <motion.aside className="student-sidebar" initial={{ opacity: 0, x: -24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.45 }}>
+                        <motion.div className="student-sidebar__top" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08, duration: 0.4 }}>
                             <div className="student-sidebar__eyebrow">Explore Board</div>
                             <h3>Categories</h3>
                             <p>Open any category to browse notices across departments and societies.</p>
                             <div className="student-role-badge">Role: Student</div>
-                        </div>
+                        </motion.div>
                         <div className="student-sidebar__list">
                             {CATEGORIES.map((cat, index) => (
-                                <button
+                                <motion.button
                                     key={cat}
                                     type="button"
                                     className="student-sidebar__item"
                                     style={{ '--fade-delay': `${index * 0.03}s` }}
                                     onClick={() => navigate(`/category/${encodeURIComponent(cat)}`)}
+                                    initial={{ opacity: 0, x: -18 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: 0.08 + index * 0.04, duration: 0.35 }}
+                                    whileHover={{ x: 6, scale: 1.01 }}
+                                    whileTap={{ scale: 0.99 }}
                                 >
                                     <div className="student-sidebar__item-glow"></div>
                                     <span>{cat}</span>
-                                </button>
+                                </motion.button>
                             ))}
                         </div>
-                    </aside>
+                    </motion.aside>
 
                     <section className="student-main-panel">
-                        <div className="student-hero">
+                        <motion.div className="student-hero" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12, duration: 0.45 }}>
                             <h1>College Notice Board</h1>
                             <p>
                                 Browse campus-wide updates, society announcements, and notices from your department.
                                 Other department notices are available from the category sidebar.
                             </p>
-                        </div>
+                        </motion.div>
 
                         {loading ? (
                             <p>Loading notices...</p>
@@ -138,31 +150,36 @@ const Home = () => {
                 </div>
             ) : (
                 <div className="student-dashboard-shell">
-                    <aside className="student-sidebar">
-                        <div className="student-sidebar__top">
+                    <motion.aside className="student-sidebar" initial={{ opacity: 0, x: -24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.45 }}>
+                        <motion.div className="student-sidebar__top" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08, duration: 0.4 }}>
                             <div className="student-sidebar__eyebrow">Explore Board</div>
                             <h3>Categories</h3>
                             <p>Open any category to browse notices. All active notices are shown on the main board.</p>
                             <div className="student-role-badge">Role: {user?.role || 'User'}</div>
-                        </div>
+                        </motion.div>
                         <div className="student-sidebar__list">
                             {CATEGORIES.map((cat, index) => (
-                                <button
+                                <motion.button
                                     key={cat}
                                     type="button"
                                     className="student-sidebar__item"
                                     style={{ '--fade-delay': `${index * 0.03}s` }}
                                     onClick={() => navigate(`/category/${encodeURIComponent(cat)}`)}
+                                    initial={{ opacity: 0, x: -18 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: 0.08 + index * 0.04, duration: 0.35 }}
+                                    whileHover={{ x: 6, scale: 1.01 }}
+                                    whileTap={{ scale: 0.99 }}
                                 >
                                     <div className="student-sidebar__item-glow"></div>
                                     <span>{cat}</span>
-                                </button>
+                                </motion.button>
                             ))}
                         </div>
-                    </aside>
+                    </motion.aside>
 
                     <section className="student-main-panel">
-                        <section className="page-hero">
+                        <motion.section className="page-hero" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12, duration: 0.45 }}>
                             <div className="page-hero__badge">
                                 <BellRing size={16} />
                                 <span>Notice Board</span>
@@ -184,9 +201,9 @@ const Home = () => {
                                     </div>
                                 </div>
                             </div>
-                        </section>
+                        </motion.section>
 
-                        <section className="student-notice-section">
+                        <motion.section className="student-notice-section" initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18, duration: 0.45 }}>
                             <div className="student-notice-section__header">
                                 <h2>Latest Notices</h2>
                             </div>
@@ -219,7 +236,7 @@ const Home = () => {
                                     )}
                                 </>
                             )}
-                        </section>
+                        </motion.section>
                     </section>
                 </div>
             )}

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Calendar, User, Paperclip, X } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
 
 const NoticeCard = ({ notice }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -23,11 +24,17 @@ const NoticeCard = ({ notice }) => {
 
     return (
         <>
-            <button
+            <motion.button
                 type="button"
                 className="card notice-card"
                 onClick={() => setIsOpen(true)}
                 style={{ display: 'flex', flexDirection: 'column', width: '100%', textAlign: 'left', cursor: 'pointer' }}
+                initial={{ opacity: 0, y: 22 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                whileHover={{ y: -8, scale: 1.01 }}
+                whileTap={{ scale: 0.99 }}
+                transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
             >
                 <div style={{ padding: '1.5rem' }}>
                     {deadlineStr && (
@@ -77,88 +84,104 @@ const NoticeCard = ({ notice }) => {
 
                     <span className="notice-card__cta">Click to view full notice</span>
                 </div>
-            </button>
+            </motion.button>
 
-            {isOpen && (
-                <div className="notice-modal-backdrop" onClick={() => setIsOpen(false)}>
-                    <div className="notice-modal" onClick={(e) => e.stopPropagation()}>
-                        <button
-                            type="button"
-                            className="notice-modal__close"
-                            onClick={() => setIsOpen(false)}
-                            aria-label="Close notice"
+            <AnimatePresence>
+                {isOpen && (
+                    <motion.div
+                        className="notice-modal-backdrop"
+                        onClick={() => setIsOpen(false)}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.22 }}
+                    >
+                        <motion.div
+                            className="notice-modal"
+                            onClick={(e) => e.stopPropagation()}
+                            initial={{ opacity: 0, y: 30, scale: 0.96 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: 18, scale: 0.97 }}
+                            transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
                         >
-                            <X size={18} />
-                        </button>
+                            <button
+                                type="button"
+                                className="notice-modal__close"
+                                onClick={() => setIsOpen(false)}
+                                aria-label="Close notice"
+                            >
+                                <X size={18} />
+                            </button>
 
-                        <div className="notice-modal__content">
-                            {deadlineStr && (
-                                <div style={{ marginBottom: '1rem' }}>
+                            <div className="notice-modal__content">
+                                {deadlineStr && (
+                                    <div style={{ marginBottom: '1rem' }}>
+                                        <span style={{
+                                            background: '#ffe4e6',
+                                            color: '#e11d48',
+                                            padding: '0.25rem 0.75rem',
+                                            borderRadius: '4px',
+                                            fontSize: '0.875rem',
+                                            fontWeight: '600',
+                                            border: '1px solid #fda4af'
+                                        }}>
+                                            Deadline: {deadlineStr}
+                                        </span>
+                                    </div>
+                                )}
+
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem', marginBottom: '1rem' }}>
+                                    <h2 style={{ fontSize: '1.9rem', flex: 1 }}>{notice.title}</h2>
                                     <span style={{
-                                        background: '#ffe4e6',
-                                        color: '#e11d48',
-                                        padding: '0.25rem 0.75rem',
-                                        borderRadius: '4px',
-                                        fontSize: '0.875rem',
+                                        background: 'var(--primary)',
+                                        color: 'white',
+                                        padding: '0.35rem 0.7rem',
+                                        borderRadius: '999px',
+                                        fontSize: '0.8rem',
                                         fontWeight: '600',
-                                        border: '1px solid #fda4af'
+                                        whiteSpace: 'nowrap'
                                     }}>
-                                        Deadline: {deadlineStr}
+                                        {notice.category}
                                     </span>
                                 </div>
-                            )}
 
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem', marginBottom: '1rem' }}>
-                                <h2 style={{ fontSize: '1.9rem', flex: 1 }}>{notice.title}</h2>
-                                <span style={{
-                                    background: 'var(--primary)',
-                                    color: 'white',
-                                    padding: '0.35rem 0.7rem',
-                                    borderRadius: '999px',
-                                    fontSize: '0.8rem',
-                                    fontWeight: '600',
-                                    whiteSpace: 'nowrap'
-                                }}>
-                                    {notice.category}
-                                </span>
-                            </div>
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                                        <Calendar size={16} />
+                                        {date}
+                                    </div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                                        <User size={16} />
+                                        {notice.postedBy?.name || 'Admin'}
+                                    </div>
+                                    {notice.attachment && !isImageAttachment && (
+                                        <a
+                                            href={`http://localhost:5000${notice.attachment}`}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: 'var(--primary)' }}
+                                        >
+                                            <Paperclip size={16} />
+                                            View Attachment
+                                        </a>
+                                    )}
+                                </div>
 
-                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                                    <Calendar size={16} />
-                                    {date}
-                                </div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                                    <User size={16} />
-                                    {notice.postedBy?.name || 'Admin'}
-                                </div>
-                                {notice.attachment && !isImageAttachment && (
-                                    <a
-                                        href={`http://localhost:5000${notice.attachment}`}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                        style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: 'var(--primary)' }}
-                                    >
-                                        <Paperclip size={16} />
-                                        View Attachment
-                                    </a>
+                                <p className="notice-modal__description">{notice.description}</p>
+
+                                {isImageAttachment && (
+                                    <div className="notice-modal__poster">
+                                        <img
+                                            src={`http://localhost:5000${notice.attachment}`}
+                                            alt="Notice Poster"
+                                        />
+                                    </div>
                                 )}
                             </div>
-
-                            <p className="notice-modal__description">{notice.description}</p>
-
-                            {isImageAttachment && (
-                                <div className="notice-modal__poster">
-                                    <img
-                                        src={`http://localhost:5000${notice.attachment}`}
-                                        alt="Notice Poster"
-                                    />
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            )}
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </>
     );
 };

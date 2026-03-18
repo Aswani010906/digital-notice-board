@@ -3,15 +3,16 @@ import { useParams, Link } from 'react-router-dom';
 import { noticeService, authService } from '../services/api';
 import NoticeCard from '../components/NoticeCard';
 import { ArrowLeft, FolderOpen, LayoutList } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const CATEGORY_DISPLAY_NAMES = {
     'Whole College': 'Whole College',
-    CSE: 'Computer Science and Engineering',
-    EEE: 'Electrical and Electronics Engineering',
-    EC: 'Electronics and Communication Engineering',
-    ME: 'Mechanical Engineering',
-    CE: 'Civil Engineering',
-    RAI: 'Robotics and Artificial Intelligence',
+    CSE: 'Computer Science Department',
+    EEE: 'Electrical and Electronics Department',
+    EC: 'Electronics and Communication Department',
+    ME: 'Mechanical Department',
+    CE: 'Civil Department',
+    RAI: 'Robotics and Artificial Intelligence Department',
     IEEE: 'Institute of Electrical and Electronics Engineers',
     ISTE: 'Indian Society for Technical Education',
     IEDC: 'Innovation and Entrepreneurship Development Centre',
@@ -56,7 +57,7 @@ const CategoryPage = () => {
 
     return (
         <div className="container main-content">
-            <section className="page-hero category-page-hero">
+            <motion.section className="page-hero category-page-hero" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }}>
                 <div className="page-hero__badge">
                     <FolderOpen size={16} />
                     <span>Category View</span>
@@ -80,9 +81,9 @@ const CategoryPage = () => {
                         </div>
                     </div>
                 </div>
-            </section>
+            </motion.section>
 
-            <section className="student-notice-section category-page-section">
+            <motion.section className="student-notice-section category-page-section" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.45 }}>
                 <div className="student-notice-section__header">
                     <p className="category-page-section__subtitle">Open any notice to read the full content and poster.</p>
                 </div>
@@ -102,7 +103,7 @@ const CategoryPage = () => {
                         ))}
                     </div>
                 )}
-            </section>
+            </motion.section>
         </div>
     );
 };
