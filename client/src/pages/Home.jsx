@@ -4,8 +4,24 @@ import NoticeCard from '../components/NoticeCard';
 import { useNavigate } from 'react-router-dom';
 import { BellRing, ChevronDown, ChevronUp, LayoutList } from 'lucide-react';
 
-const CATEGORIES = ['Whole College', 'CSE', 'EEE', 'EC', 'ME', 'CE', 'RAI', 'IEEE', 'ISTE', 'TinkerHub', 'NSS', 'Arts Club'];
-const SOCIETY_CATEGORIES = ['IEEE', 'ISTE', 'TinkerHub', 'NSS', 'Arts Club'];
+const CATEGORIES = ['Whole College', 'CSE', 'EEE', 'EC', 'ME', 'CE', 'RAI', 'IEEE', 'ISTE', 'IEDC', 'TinkerHub', 'NSS', 'Sports', 'Arts Club'];
+const SOCIETY_CATEGORIES = ['IEEE', 'ISTE', 'IEDC', 'TinkerHub', 'NSS', 'Sports', 'Arts Club'];
+const CATEGORY_DISPLAY_NAMES = {
+    'Whole College': 'Whole College',
+    CSE: 'Computer Science and Engineering',
+    EEE: 'Electrical and Electronics Engineering',
+    EC: 'Electronics and Communication Engineering',
+    ME: 'Mechanical Engineering',
+    CE: 'Civil Engineering',
+    RAI: 'Robotics and Artificial Intelligence',
+    IEEE: 'Institute of Electrical and Electronics Engineers',
+    ISTE: 'Indian Society for Technical Education',
+    IEDC: 'Innovation and Entrepreneurship Development Centre',
+    TinkerHub: 'TinkerHub',
+    NSS: 'National Service Scheme',
+    Sports: 'Sports',
+    'Arts Club': 'Arts Club'
+};
 
 const Home = () => {
     const [notices, setNotices] = useState([]);
@@ -15,6 +31,7 @@ const Home = () => {
     const user = authService.getCurrentUser();
     const isStudent = user?.role === 'student';
     const studentDepartment = user?.department;
+    const studentDepartmentName = CATEGORY_DISPLAY_NAMES[studentDepartment] || studentDepartment;
     const initialNoticeCount = 6;
 
     useEffect(() => {
@@ -109,10 +126,10 @@ const Home = () => {
                                     'No society notices available right now.'
                                 )}
                                 {renderNoticeSection(
-                                    studentDepartment ? `${studentDepartment} Department Notices` : 'Department Notices',
+                                    studentDepartmentName ? `${studentDepartmentName} Notices` : 'Department Notices',
                                     departmentNotices,
-                                    studentDepartment
-                                        ? `No notices available for ${studentDepartment} right now.`
+                                    studentDepartmentName
+                                        ? `No notices available for ${studentDepartmentName} right now.`
                                         : 'Your department is not set yet.'
                                 )}
                             </div>
