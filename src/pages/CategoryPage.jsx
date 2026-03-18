@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { noticeService } from '../services/api';
+import { noticeService, authService } from '../services/api';
 import NoticeCard from '../components/NoticeCard';
 
 const CategoryPage = () => {
     const { catName } = useParams();
     const [notices, setNotices] = useState([]);
     const [loading, setLoading] = useState(true);
+    const user = authService.getCurrentUser();
 
     useEffect(() => {
         fetchCategoryNotices();
@@ -16,7 +17,17 @@ const CategoryPage = () => {
         setLoading(true);
         try {
             const data = await noticeService.getNotices(catName);
-            setNotices(data);
+            if (user?.role === 'student') {
+                const allowedCategories = ['Whole College', 'CSE', 'EEE', 'EC', 'ME', 'CE', 'RAI', 'IEEE', 'ISTE', 'TinkerHub', 'NSS', 'Arts Club'];
+
+                if (!allowedCategories.includes(catName)) {
+                    setNotices([]);
+                } else {
+                    setNotices(data.filter(notice => allowedCategories.includes(notice.category)));
+                }
+            } else {
+                setNotices(data);
+            }
         } catch (error) {
             console.error('Error fetching notices', error);
         } finally {
@@ -27,8 +38,8 @@ const CategoryPage = () => {
     return (
         <div className="container main-content">
             <div style={{ marginBottom: '2rem' }}>
-                <Link to="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
-                    &larr; Back to Home
+                <Link to="/notices" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+                    &larr; Back to Notices
                 </Link>
                 <h1>{catName} Notices</h1>
                 <p style={{ color: 'var(--text-muted)' }}>Showing all active notices for {catName}.</p>

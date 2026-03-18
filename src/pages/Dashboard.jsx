@@ -3,7 +3,7 @@ import { noticeService, authService } from '../services/api';
 import { useNavigate } from 'react-router-dom';
 import { Trash2 } from 'lucide-react';
 
-const CATEGORIES = ['CSE', 'EEE', 'EC', 'ME', 'CE', 'RAI', 'NSS', 'IEEE', 'Arts Club', 'Whole College'];
+const CATEGORIES = ['Whole College', 'CSE', 'EEE', 'EC', 'ME', 'CE', 'RAI', 'IEEE', 'ISTE', 'TinkerHub', 'NSS', 'Arts Club'];
 
 const Dashboard = () => {
     const [notices, setNotices] = useState([]);
