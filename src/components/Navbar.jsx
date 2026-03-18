@@ -6,7 +6,7 @@ import { Bell } from 'lucide-react';
 const Navbar = () => {
     const navigate = useNavigate();
     const user = authService.getCurrentUser();
-    const homeLink = user ? '/dashboard' : '/login';
+    const homeLink = user ? (user.role === 'student' ? '/notices' : '/dashboard') : '/login';
 
     const handleLogout = () => {
         authService.logout();
@@ -30,7 +30,9 @@ const Navbar = () => {
                             {user.role === 'admin' && (
                                 <NavLink to="/admin/users" style={({ isActive }) => ({ color: isActive ? 'var(--text-main)' : 'var(--text-muted)', fontWeight: isActive ? '700' : '500' })}>Admin Users</NavLink>
                             )}
-                            <NavLink to="/dashboard" style={({ isActive }) => ({ color: isActive ? 'var(--text-main)' : 'var(--text-muted)', fontWeight: isActive ? '700' : '500' })}>Dashboard</NavLink>
+                            {user.role !== 'student' && (
+                                <NavLink to="/dashboard" style={({ isActive }) => ({ color: isActive ? 'var(--text-main)' : 'var(--text-muted)', fontWeight: isActive ? '700' : '500' })}>Dashboard</NavLink>
+                            )}
                             <span style={{ marginLeft: '1rem', color: 'var(--text-main)', fontSize: '0.9rem', opacity: 0.8 }}>
                                 Welcome, <strong>{user.name}</strong>
                             </span>

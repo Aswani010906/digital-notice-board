@@ -10,6 +10,11 @@ import ArchivePage from './pages/ArchivePage';
 import UserManagement from './pages/UserManagement';
 import { authService } from './services/api';
 
+function getDefaultRoute(user) {
+  if (!user) return '/login';
+  return user.role === 'student' ? '/notices' : '/dashboard';
+}
+
 function ProtectedRoute({ children }) {
   const user = authService.getCurrentUser();
   return user ? children : <Navigate to="/login" replace />;
@@ -17,7 +22,7 @@ function ProtectedRoute({ children }) {
 
 function PublicOnlyRoute({ children }) {
   const user = authService.getCurrentUser();
-  return user ? <Navigate to="/dashboard" replace /> : children;
+  return user ? <Navigate to={getDefaultRoute(user)} replace /> : children;
 }
 
 function AppLayout() {
@@ -85,7 +90,7 @@ function AppLayout() {
               </ProtectedRoute>
             }
           />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<Navigate to={getDefaultRoute(authService.getCurrentUser())} replace />} />
         </Routes>
       </main>
       {!isAuthPage && <Footer />}

@@ -43,6 +43,14 @@ const Home = () => {
                 </p>
             </div>
 
+            {user?.role === 'student' && (
+                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '2rem' }}>
+                    <div className="btn btn-outline" style={{ cursor: 'default', fontWeight: '700', padding: '0.75rem 1.4rem' }}>
+                        Role: Student
+                    </div>
+                </div>
+            )}
+
             <div style={{ marginBottom: '2rem' }}>
                 <h3 style={{ marginBottom: '1rem' }}>Filter by Category</h3>
                 <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>

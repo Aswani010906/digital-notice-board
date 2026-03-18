@@ -20,8 +20,8 @@ const Login = () => {
         setError('');
 
         try {
-            await authService.login({ email, password });
-            navigate('/dashboard');
+            const user = await authService.login({ email, password });
+            navigate(user.role === 'student' ? '/notices' : '/dashboard');
         } catch (err) {
             setError(err.response?.data?.message || 'Login failed. Please try again.');
         } finally {
