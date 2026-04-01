@@ -1,16 +1,15 @@
 import React from 'react';
-import { NavLink, Link, useNavigate } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import { authService } from '../services/api';
 import { Bell } from 'lucide-react';
 
 const Navbar = () => {
-    const navigate = useNavigate();
     const user = authService.getCurrentUser();
     const homeLink = user ? (user.role === 'student' ? '/notices' : '/dashboard') : '/login';
 
     const handleLogout = () => {
         authService.logout();
-        navigate('/login');
+        window.location.replace('/login');
     };
 
     return (

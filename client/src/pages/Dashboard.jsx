@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { noticeService, authService } from '../services/api';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { ClipboardList, FilePlus2, ImagePlus, ShieldCheck, Trash2 } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -17,15 +17,8 @@ const Dashboard = () => {
     const navigate = useNavigate();
     const user = authService.getCurrentUser();
 
-    if (!user) {
-        navigate('/login');
-        return null;
-    }
-
-    if (user.role === 'student') {
-        navigate('/notices');
-        return null;
-    }
+    if (!user) return <Navigate to="/login" replace />;
+    if (user.role === 'student') return <Navigate to="/notices" replace />;
 
     useEffect(() => {
         fetchMyNotices();
