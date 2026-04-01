@@ -1,6 +1,7 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
+const path = require('path');
 const connectDB = require('./utils/db');
 const startArchiver = require('./utils/archiveScheduler');
 
@@ -9,8 +10,8 @@ const noticeRoutes = require('./routes/noticeRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const userRoutes = require('./routes/userRoutes');
 
-// Load env vars
-dotenv.config();
+// Load env vars from the server directory regardless of the current working directory.
+dotenv.config({ path: path.resolve(__dirname, '.env') });
 
 // Connect to database
 connectDB();
@@ -25,7 +26,6 @@ app.use(express.json());
 startArchiver();
 
 // Serve static files (Uploaded Posters)
-const path = require('path');
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes

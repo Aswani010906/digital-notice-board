@@ -63,13 +63,21 @@ const Dashboard = () => {
         }
     };
 
-    const handleDelete = async (id) => {
+    const handleDelete = async (notice) => {
+        if (notice.postedBy?._id !== user._id) {
+            alert('Cannot delete this notice. Only the person who created it can delete it.');
+            return;
+        }
+
         if (window.confirm('Are you sure you want to delete this notice?')) {
             try {
-                await noticeService.deleteNotice(id);
+                await noticeService.deleteNotice(notice._id);
                 fetchMyNotices();
             } catch (err) {
-                alert('Failed to delete notice: ' + (err.response?.data?.message || err.message));
+                const message = err.response?.status === 403
+                    ? 'Cannot delete this notice. Only the person who created it can delete it.'
+                    : `Failed to delete notice: ${err.response?.data?.message || err.message}`;
+                alert(message);
             }
         }
     };
@@ -131,7 +139,7 @@ const Dashboard = () => {
                                     <h4 style={{ marginBottom: '0.25rem' }}>{notice.title}</h4>
                                     <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>{notice.category}</p>
                                 </div>
-                                <button onClick={() => handleDelete(notice._id)} className="btn btn-danger" style={{ padding: '0.5rem' }}>
+                                <button onClick={() => handleDelete(notice)} className="btn btn-danger" style={{ padding: '0.5rem' }}>
                                     <Trash2 size={16} />
                                 </button>
                             </div>

@@ -77,7 +77,7 @@ const updateNotice = async (req, res) => {
         const notice = await Notice.findById(req.params.id);
 
         if (notice) {
-            // Only the creator can update their notice
+            // Only the creator can update their notice.
             if (notice.postedBy.toString() !== req.user._id.toString()) {
                 return res.status(403).json({ message: 'User not authorized to update this notice' });
             }
@@ -115,9 +115,9 @@ const deleteNotice = async (req, res) => {
         const notice = await Notice.findById(req.params.id);
 
         if (notice) {
-            // Only the creator can delete their notice
+            // Only the creator can delete their notice.
             if (notice.postedBy.toString() !== req.user._id.toString()) {
-                return res.status(403).json({ message: 'User not authorized to delete this notice' });
+                return res.status(403).json({ message: 'Cannot delete this notice. Only the person who created it can delete it.' });
             }
 
             await notice.deleteOne();
