@@ -1,5 +1,18 @@
 const Notice = require('../models/Notice');
 
+const normalizeExpiryDate = (value) => {
+    if (value === undefined) return undefined;
+    if (!value) return null;
+
+    const normalizedDate = new Date(value);
+    if (Number.isNaN(normalizedDate.getTime())) {
+        return value;
+    }
+
+    normalizedDate.setHours(23, 59, 59, 999);
+    return normalizedDate;
+};
+
 // @desc    Get all notices
 // @route   GET /api/notices
 // @access  Public
@@ -44,6 +57,7 @@ const createNotice = async (req, res) => {
     try {
         const { title, description, category, expiryDate, deadline } = req.body;
         let attachment = req.body.attachment || '';
+        const normalizedExpiryDate = normalizeExpiryDate(expiryDate);
 
         // If a file was uploaded, set the attachment URL to the local file path
         if (req.file) {
@@ -55,7 +69,7 @@ const createNotice = async (req, res) => {
             description,
             category,
             attachment,
-            expiryDate,
+            expiryDate: normalizedExpiryDate,
             deadline,
             postedBy: req.user._id,
         });
@@ -93,7 +107,7 @@ const updateNotice = async (req, res) => {
             notice.description = description || notice.description;
             notice.category = category || notice.category;
             notice.attachment = attachment;
-            notice.expiryDate = expiryDate !== undefined ? expiryDate : notice.expiryDate;
+            notice.expiryDate = expiryDate !== undefined ? normalizeExpiryDate(expiryDate) : notice.expiryDate;
             notice.deadline = deadline !== undefined ? deadline : notice.deadline;
             if (isArchived !== undefined) notice.isArchived = isArchived;
 

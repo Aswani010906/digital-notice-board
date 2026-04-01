@@ -34,8 +34,10 @@ const Dashboard = () => {
     const fetchMyNotices = async () => {
         try {
             const data = await noticeService.getNotices();
-            const myNotices = data.filter(n => n.postedBy?._id === user._id);
-            setNotices(myNotices);
+            const manageableNotices = user.role === 'admin'
+                ? data
+                : data.filter((notice) => notice.postedBy?._id === user._id);
+            setNotices(manageableNotices);
         } catch (err) {
             console.error(err);
         } finally {
@@ -177,7 +179,7 @@ const Dashboard = () => {
                         </div>
                         <div>
                             <h2>Manage Notices</h2>
-                            <p>Quickly review and remove notices you have already published.</p>
+                            <p>{user.role === 'admin' ? 'Quickly review and remove notices posted across the platform.' : 'Quickly review and remove notices you have already published.'}</p>
                         </div>
                     </div>
 
@@ -192,6 +194,9 @@ const Dashboard = () => {
                                     <h4>{notice.title}</h4>
                                     <div className="dashboard-notice-row__meta">
                                         <span className="dashboard-notice-chip">{notice.category}</span>
+                                        {user.role === 'admin' && notice.postedBy?.name && (
+                                            <span>By {notice.postedBy.name}</span>
+                                        )}
                                         <span>{new Date(notice.createdAt).toLocaleDateString('en-US', {
                                             day: 'numeric',
                                             month: 'short',

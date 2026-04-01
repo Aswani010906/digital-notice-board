@@ -1,5 +1,23 @@
 const Notice = require('../models/Notice');
 
+const canManageNotice = (notice, user) => {
+    if (!notice || !user) return false;
+    return user.role === 'admin' || notice.postedBy.toString() === user._id.toString();
+};
+
+const normalizeExpiryDate = (value) => {
+    if (value === undefined) return undefined;
+    if (!value) return null;
+
+    const normalizedDate = new Date(value);
+    if (Number.isNaN(normalizedDate.getTime())) {
+        return value;
+    }
+
+    normalizedDate.setHours(23, 59, 59, 999);
+    return normalizedDate;
+};
+
 // @desc    Get all notices
 // @route   GET /api/notices
 // @access  Public
@@ -44,6 +62,7 @@ const createNotice = async (req, res) => {
     try {
         const { title, description, category, expiryDate, deadline } = req.body;
         let attachment = req.body.attachment || '';
+        const normalizedExpiryDate = normalizeExpiryDate(expiryDate);
 
         // If a file was uploaded, set the attachment URL to the local file path
         if (req.file) {
@@ -55,7 +74,7 @@ const createNotice = async (req, res) => {
             description,
             category,
             attachment,
-            expiryDate,
+            expiryDate: normalizedExpiryDate,
             deadline,
             postedBy: req.user._id,
         });
@@ -69,7 +88,7 @@ const createNotice = async (req, res) => {
 
 // @desc    Update a notice
 // @route   PUT /api/notices/:id
-// @access  Private (Owner only)
+// @access  Private (Owner or Admin)
 const updateNotice = async (req, res) => {
     try {
         const { title, description, category, expiryDate, deadline, isArchived } = req.body;
@@ -77,8 +96,7 @@ const updateNotice = async (req, res) => {
         const notice = await Notice.findById(req.params.id);
 
         if (notice) {
-            // Only the creator can update their notice.
-            if (notice.postedBy.toString() !== req.user._id.toString()) {
+            if (!canManageNotice(notice, req.user)) {
                 return res.status(403).json({ message: 'User not authorized to update this notice' });
             }
 
@@ -93,7 +111,7 @@ const updateNotice = async (req, res) => {
             notice.description = description || notice.description;
             notice.category = category || notice.category;
             notice.attachment = attachment;
-            notice.expiryDate = expiryDate !== undefined ? expiryDate : notice.expiryDate;
+            notice.expiryDate = expiryDate !== undefined ? normalizeExpiryDate(expiryDate) : notice.expiryDate;
             notice.deadline = deadline !== undefined ? deadline : notice.deadline;
             if (isArchived !== undefined) notice.isArchived = isArchived;
 
@@ -109,15 +127,14 @@ const updateNotice = async (req, res) => {
 
 // @desc    Delete a notice
 // @route   DELETE /api/notices/:id
-// @access  Private (Owner only)
+// @access  Private (Owner or Admin)
 const deleteNotice = async (req, res) => {
     try {
         const notice = await Notice.findById(req.params.id);
 
         if (notice) {
-            // Only the creator can delete their notice.
-            if (notice.postedBy.toString() !== req.user._id.toString()) {
-                return res.status(403).json({ message: 'Cannot delete this notice. Only the person who created it can delete it.' });
+            if (!canManageNotice(notice, req.user)) {
+                return res.status(403).json({ message: 'User not authorized to delete this notice' });
             }
 
             await notice.deleteOne();

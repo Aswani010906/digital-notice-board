@@ -64,7 +64,7 @@ const Dashboard = () => {
     };
 
     const handleDelete = async (notice) => {
-        if (notice.postedBy?._id !== user._id) {
+        if (user.role !== 'admin' && notice.postedBy?._id !== user._id) {
             alert('Cannot delete this notice. Only the person who created it can delete it.');
             return;
         }

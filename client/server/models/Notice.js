@@ -13,7 +13,7 @@ const noticeSchema = new mongoose.Schema(
         category: {
             type: String,
             required: true,
-            enum: ['CSE', 'EEE', 'EC', 'ME', 'CE', 'RAI', 'NSS', 'IEEE', 'Arts Club', 'Whole College'],
+            enum: ['Whole College', 'CSE', 'EEE', 'EC', 'ME', 'CE', 'RAI', 'IEEE', 'ISTE', 'IEDC', 'TinkerHub', 'NSS', 'Sports', 'Arts Club'],
         },
         postedBy: {
             type: mongoose.Schema.Types.ObjectId,
