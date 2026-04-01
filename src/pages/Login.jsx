@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { authService } from '../services/api';
 import { useNavigate } from 'react-router-dom';
-import { BellRing, ShieldCheck, Sparkles } from 'lucide-react';
+import { BellRing, Eye, EyeOff, ShieldCheck, Sparkles } from 'lucide-react';
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
@@ -82,13 +83,24 @@ const Login = () => {
                             </div>
                             <div className="form-group">
                                 <label className="form-label">Password</label>
-                                <input
-                                    type="password"
-                                    className="form-input"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    placeholder="Enter your password"
-                                />
+                                <div className="password-input-wrap">
+                                    <input
+                                        type={showPassword ? 'text' : 'password'}
+                                        className="form-input password-input"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        placeholder="Enter your password"
+                                    />
+                                    <button
+                                        type="button"
+                                        className="password-toggle"
+                                        onClick={() => setShowPassword((value) => !value)}
+                                        aria-label={showPassword ? 'Hide password' : 'Show password'}
+                                        aria-pressed={showPassword}
+                                    >
+                                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                    </button>
+                                </div>
                             </div>
                             <button
                                 type="submit"
