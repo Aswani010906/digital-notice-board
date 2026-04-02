@@ -2,17 +2,38 @@ import React, { useEffect, useState } from 'react';
 import { noticeService, authService } from '../services/api';
 import NoticeCard from '../components/NoticeCard';
 import { useNavigate } from 'react-router-dom';
+import { BellRing, ChevronDown, ChevronUp, LayoutList } from 'lucide-react';
+import { motion } from 'framer-motion';
 
-const CATEGORIES = ['Whole College', 'CSE', 'EEE', 'EC', 'ME', 'CE', 'RAI', 'IEEE', 'ISTE', 'TinkerHub', 'NSS', 'Arts Club'];
-const SOCIETY_CATEGORIES = ['IEEE', 'ISTE', 'TinkerHub', 'NSS', 'Arts Club'];
+const CATEGORIES = ['Whole College', 'CSE', 'EEE', 'EC', 'ME', 'CE', 'RAI', 'IEEE', 'ISTE', 'IEDC', 'TinkerHub', 'NSS', 'Sports', 'Arts Club'];
+const SOCIETY_CATEGORIES = ['IEEE', 'ISTE', 'IEDC', 'TinkerHub', 'NSS', 'Sports', 'Arts Club'];
+const CATEGORY_DISPLAY_NAMES = {
+    'Whole College': 'Whole College',
+    CSE: 'Computer Science Department',
+    EEE: 'Electrical and Electronics Department',
+    EC: 'Electronics and Communication Department',
+    ME: 'Mechanical Department',
+    CE: 'Civil Department',
+    RAI: 'Robotics and Artificial Intelligence Department',
+    IEEE: 'Institute of Electrical and Electronics Engineers',
+    ISTE: 'Indian Society for Technical Education',
+    IEDC: 'Innovation and Entrepreneurship Development Centre',
+    TinkerHub: 'TinkerHub',
+    NSS: 'National Service Scheme',
+    Sports: 'Sports',
+    'Arts Club': 'Arts Club'
+};
 
 const Home = () => {
     const [notices, setNotices] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [showAllNotices, setShowAllNotices] = useState(false);
     const navigate = useNavigate();
     const user = authService.getCurrentUser();
     const isStudent = user?.role === 'student';
     const studentDepartment = user?.department;
+    const studentDepartmentName = CATEGORY_DISPLAY_NAMES[studentDepartment] || studentDepartment;
+    const initialNoticeCount = 6;
 
     useEffect(() => {
         fetchNotices();
@@ -34,9 +55,16 @@ const Home = () => {
     const departmentNotices = studentDepartment
         ? notices.filter((notice) => notice.category === studentDepartment)
         : [];
+    const visibleAdminNotices = showAllNotices ? notices : notices.slice(0, initialNoticeCount);
 
     const renderNoticeSection = (title, items, emptyText) => (
-        <section className="student-notice-section">
+        <motion.section
+            className="student-notice-section"
+            initial={{ opacity: 0, y: 22 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.15 }}
+            transition={{ duration: 0.45 }}
+        >
             <div className="student-notice-section__header">
                 <h2>{title}</h2>
             </div>
@@ -45,52 +73,55 @@ const Home = () => {
                     {emptyText}
                 </div>
             ) : (
-                <div className="grid grid-cols-1 grid-cols-2">
+                <div className="grid grid-cols-1 grid-cols-2 grid-cols-3 grid-cols-4">
                     {items.map((notice) => (
                         <NoticeCard key={notice._id} notice={notice} />
                     ))}
                 </div>
             )}
-        </section>
+        </motion.section>
     );
 
     return (
         <div className="container main-content">
             {isStudent ? (
                 <div className="student-dashboard-shell">
-                    <aside className="student-sidebar">
-                        <div className="student-sidebar__top">
+                    <motion.aside className="student-sidebar" initial={{ opacity: 0, x: -24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.45 }}>
+                        <motion.div className="student-sidebar__top" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08, duration: 0.4 }}>
                             <div className="student-sidebar__eyebrow">Explore Board</div>
                             <h3>Categories</h3>
                             <p>Open any category to browse notices across departments and societies.</p>
                             <div className="student-role-badge">Role: Student</div>
-                        </div>
+                        </motion.div>
                         <div className="student-sidebar__list">
-                            {CATEGORIES.map((cat, index) => {
-                                return (
-                                    <button
-                                        key={cat}
-                                        type="button"
-                                        className="student-sidebar__item"
-                                        style={{ '--fade-delay': `${index * 0.03}s` }}
-                                        onClick={() => navigate(`/category/${encodeURIComponent(cat)}`)}
-                                    >
-                                        <div className="student-sidebar__item-glow"></div>
-                                        <span>{cat}</span>
-                                    </button>
-                                );
-                            })}
+                            {CATEGORIES.map((cat, index) => (
+                                <motion.button
+                                    key={cat}
+                                    type="button"
+                                    className="student-sidebar__item"
+                                    style={{ '--fade-delay': `${index * 0.03}s` }}
+                                    onClick={() => navigate(`/category/${encodeURIComponent(cat)}`)}
+                                    initial={{ opacity: 0, x: -18 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: 0.08 + index * 0.04, duration: 0.35 }}
+                                    whileHover={{ x: 6, scale: 1.01 }}
+                                    whileTap={{ scale: 0.99 }}
+                                >
+                                    <div className="student-sidebar__item-glow"></div>
+                                    <span>{cat}</span>
+                                </motion.button>
+                            ))}
                         </div>
-                    </aside>
+                    </motion.aside>
 
                     <section className="student-main-panel">
-                        <div className="student-hero">
+                        <motion.div className="student-hero" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12, duration: 0.45 }}>
                             <h1>College Notice Board</h1>
                             <p>
                                 Browse campus-wide updates, society announcements, and notices from your department.
                                 Other department notices are available from the category sidebar.
                             </p>
-                        </div>
+                        </motion.div>
 
                         {loading ? (
                             <p>Loading notices...</p>
@@ -107,10 +138,10 @@ const Home = () => {
                                     'No society notices available right now.'
                                 )}
                                 {renderNoticeSection(
-                                    studentDepartment ? `${studentDepartment} Department Notices` : 'Department Notices',
+                                    studentDepartmentName ? `${studentDepartmentName} Notices` : 'Department Notices',
                                     departmentNotices,
-                                    studentDepartment
-                                        ? `No notices available for ${studentDepartment} right now.`
+                                    studentDepartmentName
+                                        ? `No notices available for ${studentDepartmentName} right now.`
                                         : 'Your department is not set yet.'
                                 )}
                             </div>
@@ -118,56 +149,96 @@ const Home = () => {
                     </section>
                 </div>
             ) : (
-                <>
-                    <div style={{ position: 'relative', marginBottom: '3rem' }}>
-                        <div style={{ textAlign: 'center' }}>
-                            <h1 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>College Digital Notice Board</h1>
-                            <p style={{ color: 'var(--text-muted)', fontSize: '1.2rem', maxWidth: '600px', margin: '0 auto' }}>
-                                Stay updated with the latest announcements, events, and important notices from all departments and clubs.
-                            </p>
-                        </div>
-                    </div>
-
-                    <div style={{ marginBottom: '2rem' }}>
-                        <h3 style={{ marginBottom: '1rem' }}>Filter by Category</h3>
-                        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                            {CATEGORIES.map(cat => (
-                                <button
+                <div className="student-dashboard-shell">
+                    <motion.aside className="student-sidebar" initial={{ opacity: 0, x: -24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.45 }}>
+                        <motion.div className="student-sidebar__top" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08, duration: 0.4 }}>
+                            <div className="student-sidebar__eyebrow">Explore Board</div>
+                            <h3>Categories</h3>
+                            <p>Open any category to browse notices. All active notices are shown on the main board.</p>
+                            <div className="student-role-badge">Role: {user?.role || 'User'}</div>
+                        </motion.div>
+                        <div className="student-sidebar__list">
+                            {CATEGORIES.map((cat, index) => (
+                                <motion.button
                                     key={cat}
-                                    className="btn btn-outline"
+                                    type="button"
+                                    className="student-sidebar__item"
+                                    style={{ '--fade-delay': `${index * 0.03}s` }}
                                     onClick={() => navigate(`/category/${encodeURIComponent(cat)}`)}
+                                    initial={{ opacity: 0, x: -18 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: 0.08 + index * 0.04, duration: 0.35 }}
+                                    whileHover={{ x: 6, scale: 1.01 }}
+                                    whileTap={{ scale: 0.99 }}
                                 >
-                                    {cat}
-                                </button>
+                                    <div className="student-sidebar__item-glow"></div>
+                                    <span>{cat}</span>
+                                </motion.button>
                             ))}
                         </div>
-                    </div>
+                    </motion.aside>
 
-                    <h2 style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <span style={{
-                            display: 'inline-block',
-                            width: '8px',
-                            height: '24px',
-                            background: 'var(--primary)',
-                            borderRadius: '4px'
-                        }}></span>
-                        Latest Notices
-                    </h2>
+                    <section className="student-main-panel">
+                        <motion.section className="page-hero" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12, duration: 0.45 }}>
+                            <div className="page-hero__badge">
+                                <BellRing size={16} />
+                                <span>Notice Board</span>
+                            </div>
+                            <div className="page-hero__header">
+                                <div>
+                                    <h1>College Digital Notice Board</h1>
+                                    <p>
+                                        Stay updated with the latest announcements, events, and important notices from all departments and clubs.
+                                    </p>
+                                </div>
+                                <div className="page-hero__stats">
+                                    <div className="page-hero-stat">
+                                        <LayoutList size={18} />
+                                        <div>
+                                            <strong>{notices.length}</strong>
+                                            <span>Active Notices</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </motion.section>
 
-                    {loading ? (
-                        <p>Loading notices...</p>
-                    ) : notices.length === 0 ? (
-                        <div className="card" style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>
-                            No notices found.
-                        </div>
-                    ) : (
-                        <div className="grid grid-cols-1 grid-cols-2 lg:grid-cols-3">
-                            {notices.map(notice => (
-                                <NoticeCard key={notice._id} notice={notice} />
-                            ))}
-                        </div>
-                    )}
-                </>
+                        <motion.section className="student-notice-section" initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18, duration: 0.45 }}>
+                            <div className="student-notice-section__header">
+                                <h2>Latest Notices</h2>
+                            </div>
+
+                            {loading ? (
+                                <p>Loading notices...</p>
+                            ) : notices.length === 0 ? (
+                                <div className="student-empty-state">
+                                    No notices found.
+                                </div>
+                            ) : (
+                                <>
+                                    <div className="grid grid-cols-1 grid-cols-2 grid-cols-3 grid-cols-4">
+                                        {visibleAdminNotices.map((notice) => (
+                                            <NoticeCard key={notice._id} notice={notice} />
+                                        ))}
+                                    </div>
+
+                                    {notices.length > initialNoticeCount && (
+                                        <div className="notice-expand-wrap">
+                                            <button
+                                                type="button"
+                                                className="notice-expand-btn"
+                                                onClick={() => setShowAllNotices((current) => !current)}
+                                            >
+                                                {showAllNotices ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                                                <span>{showAllNotices ? 'Show Less' : 'Show More'}</span>
+                                            </button>
+                                        </div>
+                                    )}
+                                </>
+                            )}
+                        </motion.section>
+                    </section>
+                </div>
             )}
         </div>
     );

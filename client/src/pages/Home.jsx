@@ -73,7 +73,7 @@ const Home = () => {
                     {emptyText}
                 </div>
             ) : (
-                <div className="grid grid-cols-1 grid-cols-2">
+                <div className="grid grid-cols-1 grid-cols-2 grid-cols-3 grid-cols-4">
                     {items.map((notice) => (
                         <NoticeCard key={notice._id} notice={notice} />
                     ))}
@@ -216,7 +216,7 @@ const Home = () => {
                                 </div>
                             ) : (
                                 <>
-                                    <div className="grid grid-cols-1 grid-cols-2 lg:grid-cols-3">
+                                    <div className="grid grid-cols-1 grid-cols-2 grid-cols-3 grid-cols-4">
                                         {visibleAdminNotices.map((notice) => (
                                             <NoticeCard key={notice._id} notice={notice} />
                                         ))}

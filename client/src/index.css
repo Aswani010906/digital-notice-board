@@ -200,6 +200,23 @@ a:hover {
   }
 }
 
+@media (min-width: 1280px) {
+  .grid-cols-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (min-width: 1536px) {
+  .grid-cols-5 {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+.notice-small-box {
+  min-height: 140px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+}
+
 .card {
   background: var(--card-bg);
   border-radius: var(--radius);

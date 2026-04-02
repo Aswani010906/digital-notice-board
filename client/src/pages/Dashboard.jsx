@@ -3,6 +3,7 @@ import { noticeService, authService } from '../services/api';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { ClipboardList, FilePlus2, ImagePlus, ShieldCheck, Trash2 } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
+import NoticeCard from '../components/NoticeCard';
 
 const CATEGORIES = ['Whole College', 'CSE', 'EEE', 'EC', 'ME', 'CE', 'RAI', 'IEEE', 'ISTE', 'IEDC', 'TinkerHub', 'NSS', 'Sports', 'Arts Club'];
 
@@ -181,28 +182,44 @@ const Dashboard = () => {
                             <p>Loading...</p>
                         ) : notices.length === 0 ? (
                             <div className="dashboard-empty-state">No notices posted by you yet.</div>
-                        ) : notices.map(notice => (
-                            <motion.div key={notice._id} className="dashboard-notice-row" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
-                                <div className="dashboard-notice-row__copy">
-                                    <h4>{notice.title}</h4>
-                                    <div className="dashboard-notice-row__meta">
-                                        <span className="dashboard-notice-chip">{notice.category}</span>
-                                        {user.role === 'admin' && notice.postedBy?.name && (
-                                            <span>By {notice.postedBy.name}</span>
-                                        )}
-                                        <span>{new Date(notice.createdAt).toLocaleDateString('en-US', {
-                                            day: 'numeric',
-                                            month: 'short',
-                                            year: 'numeric'
-                                        })}</span>
+                        ) : (
+                            <div className="grid grid-cols-1 grid-cols-2 grid-cols-3 grid-cols-4">
+                                {notices.map(notice => (
+                                    <div key={notice._id} style={{ position: 'relative' }}>
+                                        <NoticeCard notice={notice} />
+                                        <button 
+                                            onClick={(e) => { 
+                                                e.stopPropagation(); 
+                                                setNoticeToDelete(notice); 
+                                            }}
+                                            className="dashboard-delete-btn-overlay"
+                                            style={{ 
+                                                position: 'absolute', 
+                                                top: '-8px', 
+                                                right: '-8px', 
+                                                background: 'var(--danger)', 
+                                                color: 'white', 
+                                                border: 'none', 
+                                                borderRadius: '50%', 
+                                                width: '32px', 
+                                                height: '32px', 
+                                                display: 'flex', 
+                                                alignItems: 'center', 
+                                                justifyContent: 'center', 
+                                                cursor: 'pointer', 
+                                                zIndex: 10, 
+                                                boxShadow: '0 4px 8px rgba(220, 38, 38, 0.3)',
+                                                transition: 'transform 0.2s ease, background 0.2s ease'
+                                            }}
+                                            onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.1)'; e.currentTarget.style.background = '#dc2626'; }}
+                                            onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.background = 'var(--danger)'; }}
+                                        >
+                                            <Trash2 size={15} />
+                                        </button>
                                     </div>
-                                </div>
-                                <button onClick={() => setNoticeToDelete(notice)} className="btn btn-danger dashboard-delete-btn">
-                                    <span>Delete</span>
-                                    <Trash2 size={16} />
-                                </button>
-                            </motion.div>
-                        ))}
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </motion.section>
             </div>

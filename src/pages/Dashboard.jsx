@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { noticeService, authService } from '../services/api';
-import { useNavigate } from 'react-router-dom';
-import { Trash2 } from 'lucide-react';
+import { Navigate, useNavigate } from 'react-router-dom';
+import { ClipboardList, FilePlus2, ImagePlus, ShieldCheck, Trash2 } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import NoticeCard from '../components/NoticeCard';
 
-const CATEGORIES = ['Whole College', 'CSE', 'EEE', 'EC', 'ME', 'CE', 'RAI', 'IEEE', 'ISTE', 'TinkerHub', 'NSS', 'Arts Club'];
+const CATEGORIES = ['Whole College', 'CSE', 'EEE', 'EC', 'ME', 'CE', 'RAI', 'IEEE', 'ISTE', 'IEDC', 'TinkerHub', 'NSS', 'Sports', 'Arts Club'];
 
 const Dashboard = () => {
     const [notices, setNotices] = useState([]);
@@ -11,18 +13,13 @@ const Dashboard = () => {
     const [formData, setFormData] = useState({ title: '', description: '', category: 'Whole College', deadline: '', expiryDate: '', file: null });
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const [noticeToDelete, setNoticeToDelete] = useState(null);
+    const [isDeleting, setIsDeleting] = useState(false);
     const navigate = useNavigate();
     const user = authService.getCurrentUser();
 
-    if (!user) {
-        navigate('/login');
-        return null;
-    }
-
-    if (user.role === 'student') {
-        navigate('/notices');
-        return null;
-    }
+    if (!user) return <Navigate to="/login" replace />;
+    if (user.role === 'student') return <Navigate to="/notices" replace />;
 
     useEffect(() => {
         fetchMyNotices();
@@ -31,9 +28,10 @@ const Dashboard = () => {
     const fetchMyNotices = async () => {
         try {
             const data = await noticeService.getNotices();
-            // Filter my notices (or Admin sees all - simplistic approach here)
-            const myNotices = user.role === 'admin' ? data : data.filter(n => n.postedBy?._id === user._id);
-            setNotices(myNotices);
+            const manageableNotices = user.role === 'admin'
+                ? data
+                : data.filter((notice) => notice.postedBy?._id === user._id);
+            setNotices(manageableNotices);
         } catch (err) {
             console.error(err);
         } finally {
@@ -63,90 +61,202 @@ const Dashboard = () => {
         }
     };
 
-    const handleDelete = async (notice) => {
-        if (user.role !== 'admin' && notice.postedBy?._id !== user._id) {
-            alert('Cannot delete this notice. Only the person who created it can delete it.');
-            return;
-        }
+    const handleDelete = async () => {
+        if (!noticeToDelete) return;
 
-        if (window.confirm('Are you sure you want to delete this notice?')) {
-            try {
-                await noticeService.deleteNotice(notice._id);
-                fetchMyNotices();
-            } catch (err) {
-                const message = err.response?.status === 403
-                    ? 'Cannot delete this notice. Only the person who created it can delete it.'
-                    : `Failed to delete notice: ${err.response?.data?.message || err.message}`;
-                alert(message);
-            }
+        setIsDeleting(true);
+        try {
+            await noticeService.deleteNotice(noticeToDelete._id);
+            setSuccess('Notice deleted successfully.');
+            setNoticeToDelete(null);
+            fetchMyNotices();
+            setTimeout(() => setSuccess(''), 3000);
+        } catch (err) {
+            setError('Failed to delete notice: ' + (err.response?.data?.message || err.message));
+            setTimeout(() => setError(''), 3000);
+        } finally {
+            setIsDeleting(false);
         }
     };
 
     return (
         <div className="container main-content">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                <h1>Dashboard</h1>
-                <span className="btn btn-outline" style={{ cursor: 'default' }}>Role: {user.role.toUpperCase()}</span>
-            </div>
+            {(error || success) && (
+                <div className="app-toast-stack">
+                    {error && <div className="app-toast app-toast--error">{error}</div>}
+                    {success && <div className="app-toast app-toast--success">{success}</div>}
+                </div>
+            )}
 
-            <div className="grid grid-cols-1 lg:grid-cols-2">
-                {/* Create Form or Student Welcome */}
-                <div className="card" style={{ padding: '1.5rem', height: 'fit-content' }}>
-                    <h2 style={{ marginBottom: '1.5rem' }}>Post New Notice</h2>
-                    {error && <div style={{ color: 'red', marginBottom: '1rem' }}>{error}</div>}
-                    {success && <div style={{ color: 'green', marginBottom: '1rem' }}>{success}</div>}
-
-                    <form onSubmit={handleCreate}>
-                        <div className="form-group">
-                            <label className="form-label">Title</label>
-                            <input type="text" className="form-input" required value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} />
-                        </div>
-                        <div className="form-group">
-                            <label className="form-label">Description</label>
-                            <textarea className="form-input" required rows="4" value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })}></textarea>
-                        </div>
-                        <div className="form-group">
-                            <label className="form-label">Category</label>
-                            <select className="form-input" value={formData.category} onChange={e => setFormData({ ...formData, category: e.target.value })}>
-                                {CATEGORIES.map(cat => <option key={cat} value={cat}>{cat}</option>)}
-                            </select>
-                        </div>
-                        <div className="form-group" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <motion.section className="page-hero" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }}>
+                <div className="page-hero__badge">
+                    <ShieldCheck size={16} />
+                    <span>{user.role.toUpperCase()} PANEL</span>
+                </div>
+                <div className="page-hero__header">
+                    <div>
+                        <h1>Dashboard</h1>
+                        <p>Create, organize, and manage the notices you publish across the college board.</p>
+                    </div>
+                    <div className="page-hero__stats">
+                        <div className="page-hero-stat">
+                            <ClipboardList size={18} />
                             <div>
+                                <strong>{notices.length}</strong>
+                                <span>Managed Notices</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </motion.section>
+
+            <div className="dashboard-layout">
+                <motion.section className="card dashboard-panel dashboard-panel--form" initial={{ opacity: 0, y: 26 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08, duration: 0.45 }}>
+                    <div className="dashboard-panel__head">
+                        <div className="dashboard-panel__icon">
+                            <FilePlus2 size={18} />
+                        </div>
+                        <div>
+                            <h2>Post New Notice</h2>
+                            <p>Create a fresh announcement with optional dates and poster upload.</p>
+                        </div>
+                    </div>
+
+                    <form onSubmit={handleCreate} className="dashboard-form">
+                        <div className="dashboard-form__grid">
+                            <div className="form-group dashboard-form__full">
+                                <label className="form-label">Title</label>
+                                <input type="text" className="form-input" required value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} />
+                            </div>
+                            <div className="form-group dashboard-form__full">
+                                <label className="form-label">Description</label>
+                                <textarea className="form-input dashboard-textarea" required rows="5" value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })}></textarea>
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Category</label>
+                                <select className="form-input" value={formData.category} onChange={e => setFormData({ ...formData, category: e.target.value })}>
+                                    {CATEGORIES.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                                </select>
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Poster</label>
+                                <div className="dashboard-upload-wrap">
+                                    <div className="dashboard-upload-wrap__icon">
+                                        <ImagePlus size={18} />
+                                    </div>
+                                    <div className="dashboard-upload-wrap__copy">
+                                        <strong>{formData.file ? formData.file.name : 'Upload poster image'}</strong>
+                                        <span>{formData.file ? 'Poster selected successfully' : 'PNG, JPG, JPEG, WEBP or GIF'}</span>
+                                    </div>
+                                    <input type="file" accept="image/*" className="form-input" onChange={e => setFormData({ ...formData, file: e.target.files[0] })} />
+                                </div>
+                            </div>
+                            <div className="dashboard-date-card">
                                 <label className="form-label">Event Deadline</label>
+                                <p className="dashboard-date-card__hint">Optional last date for an event or registration.</p>
                                 <input type="date" className="form-input" value={formData.deadline} onChange={e => setFormData({ ...formData, deadline: e.target.value })} />
                             </div>
-                            <div>
+                            <div className="dashboard-date-card">
                                 <label className="form-label">Archive After Date</label>
+                                <p className="dashboard-date-card__hint">Move the notice to archive automatically after this date.</p>
                                 <input type="date" className="form-input" value={formData.expiryDate} onChange={e => setFormData({ ...formData, expiryDate: e.target.value })} />
                             </div>
                         </div>
-                        <div className="form-group">
-                            <label className="form-label">Upload Poster (Image)</label>
-                            <input type="file" accept="image/*" className="form-input" onChange={e => setFormData({ ...formData, file: e.target.files[0] })} />
-                        </div>
-                        <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>Post Notice</button>
+                        <button type="submit" className="btn btn-primary dashboard-submit">Post Notice</button>
                     </form>
-                </div>
+                </motion.section>
 
-                {/* Existing Notices List */}
-                <div>
-                    <h2 style={{ marginBottom: '1.5rem' }}>Manage Notices</h2>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                        {loading ? <p>Loading...</p> : notices.length === 0 ? <p>No notices posted by you yet.</p> : notices.map(notice => (
-                            <div key={notice._id} className="card" style={{ padding: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <div>
-                                    <h4 style={{ marginBottom: '0.25rem' }}>{notice.title}</h4>
-                                    <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>{notice.category}</p>
-                                </div>
-                                <button onClick={() => handleDelete(notice)} className="btn btn-danger" style={{ padding: '0.5rem' }}>
-                                    <Trash2 size={16} />
-                                </button>
-                            </div>
-                        ))}
+                <motion.section className="card dashboard-panel dashboard-panel--list" initial={{ opacity: 0, y: 26 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.14, duration: 0.45 }}>
+                    <div className="dashboard-panel__head">
+                        <div className="dashboard-panel__icon">
+                            <ClipboardList size={18} />
+                        </div>
+                        <div>
+                            <h2>Manage Notices</h2>
+                            <p>{user.role === 'admin' ? 'Quickly review and remove notices posted across the platform.' : 'Quickly review and remove notices you have already published.'}</p>
+                        </div>
                     </div>
-                </div>
+
+                    <div className="dashboard-notice-list">
+                        {loading ? (
+                            <p>Loading...</p>
+                        ) : notices.length === 0 ? (
+                            <div className="dashboard-empty-state">No notices posted by you yet.</div>
+                        ) : (
+                            <div className="grid grid-cols-1 grid-cols-2 grid-cols-3 grid-cols-4">
+                                {notices.map(notice => (
+                                    <div key={notice._id} style={{ position: 'relative' }}>
+                                        <NoticeCard notice={notice} />
+                                        <button 
+                                            onClick={(e) => { 
+                                                e.stopPropagation(); 
+                                                setNoticeToDelete(notice); 
+                                            }}
+                                            className="dashboard-delete-btn-overlay"
+                                            style={{ 
+                                                position: 'absolute', 
+                                                top: '-8px', 
+                                                right: '-8px', 
+                                                background: 'var(--danger)', 
+                                                color: 'white', 
+                                                border: 'none', 
+                                                borderRadius: '50%', 
+                                                width: '32px', 
+                                                height: '32px', 
+                                                display: 'flex', 
+                                                alignItems: 'center', 
+                                                justifyContent: 'center', 
+                                                cursor: 'pointer', 
+                                                zIndex: 10, 
+                                                boxShadow: '0 4px 8px rgba(220, 38, 38, 0.3)',
+                                                transition: 'transform 0.2s ease, background 0.2s ease'
+                                            }}
+                                            onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.1)'; e.currentTarget.style.background = '#dc2626'; }}
+                                            onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.background = 'var(--danger)'; }}
+                                        >
+                                            <Trash2 size={15} />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </motion.section>
             </div>
+
+            <AnimatePresence>
+            {noticeToDelete && (
+                <motion.div className="notice-modal-backdrop" onClick={() => !isDeleting && setNoticeToDelete(null)} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                    <motion.div className="dashboard-delete-modal" onClick={(e) => e.stopPropagation()} initial={{ opacity: 0, y: 24, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 18, scale: 0.97 }} transition={{ duration: 0.28 }}>
+                        <div className="dashboard-delete-modal__icon">
+                            <Trash2 size={20} />
+                        </div>
+                        <h3>Delete this notice?</h3>
+                        <p>
+                            This will remove <strong>{noticeToDelete.title}</strong> from the notice board.
+                        </p>
+                        <div className="dashboard-delete-modal__actions">
+                            <button
+                                type="button"
+                                className="btn btn-outline"
+                                onClick={() => setNoticeToDelete(null)}
+                                disabled={isDeleting}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="button"
+                                className="btn dashboard-delete-modal__confirm"
+                                onClick={handleDelete}
+                                disabled={isDeleting}
+                            >
+                                {isDeleting ? 'Deleting...' : 'Delete Notice'}
+                            </button>
+                        </div>
+                    </motion.div>
+                </motion.div>
+            )}
+            </AnimatePresence>
         </div>
     );
 };

@@ -26,63 +26,64 @@ const NoticeCard = ({ notice }) => {
         <>
             <motion.button
                 type="button"
-                className="card notice-card"
+                className="card notice-card notice-small-box"
                 onClick={() => setIsOpen(true)}
-                style={{ display: 'flex', flexDirection: 'column', width: '100%', textAlign: 'left', cursor: 'pointer' }}
-                initial={{ opacity: 0, y: 22 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.2 }}
-                whileHover={{ y: -8, scale: 1.01 }}
-                whileTap={{ scale: 0.99 }}
-                transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', textAlign: 'left', cursor: 'pointer', background: 'var(--card-bg)' }}
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true, amount: 0.1 }}
+                whileHover={{ y: -6, scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
             >
-                <div style={{ padding: '1.5rem' }}>
-                    {deadlineStr && (
-                        <div style={{ marginBottom: '1rem' }}>
-                            <span style={{
-                                background: '#ffe4e6',
-                                color: '#e11d48',
-                                padding: '0.25rem 0.75rem',
-                                borderRadius: '4px',
-                                fontSize: '0.875rem',
-                                fontWeight: '600',
-                                border: '1px solid #fda4af'
-                            }}>
-                                Deadline: {deadlineStr}
-                            </span>
-                        </div>
-                    )}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem', gap: '1rem' }}>
-                        <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem', flex: 1 }}>{notice.title}</h3>
+                <div style={{ padding: '1.25rem', width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.8rem', gap: '0.5rem' }}>
                         <span style={{
-                            background: 'var(--primary)',
-                            color: 'white',
-                            padding: '0.25rem 0.5rem',
-                            borderRadius: '999px',
+                            background: 'rgba(15, 118, 110, 0.12)',
+                            color: 'var(--primary)',
+                            padding: '0.2rem 0.6rem',
+                            borderRadius: '6px',
                             fontSize: '0.75rem',
-                            fontWeight: '600',
-                            whiteSpace: 'nowrap'
+                            fontWeight: '700',
+                            letterSpacing: '0.02em',
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis'
                         }}>
                             {notice.category}
                         </span>
+                        {(isImageAttachment || notice.attachment) && (
+                            <Paperclip size={14} style={{ color: 'var(--text-muted)' }} />
+                        )}
                     </div>
-
-                    <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem', lineHeight: 1.6 }}>
-                        {previewText}
-                    </p>
-
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', color: 'var(--text-muted)', fontSize: '0.875rem', marginBottom: '1rem' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                            <Calendar size={16} />
-                            {date}
+                    
+                    <h3 style={{ 
+                        fontSize: '1.05rem', 
+                        lineHeight: '1.4', 
+                        marginBottom: '1.2rem', 
+                        flex: 1,
+                        display: '-webkit-box',
+                        WebkitLineClamp: 3,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                        color: 'var(--text-main)'
+                    }}>
+                        {notice.title}
+                    </h3>
+                    
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 'auto', borderTop: '1px solid rgba(0,0,0,0.05)', paddingTop: '0.8rem' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: '500' }}>
+                                <Calendar size={13} />
+                                {date}
+                            </div>
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                            <User size={16} />
-                            {notice.postedBy?.name || 'Admin'}
-                        </div>
+                        {deadlineStr && (
+                            <div style={{ background: '#fff0f2', color: '#e11d48', padding: '0.15rem 0.45rem', borderRadius: '4px', fontSize: '0.7rem', fontWeight: '700' }}>
+                                Due {deadlineStr}
+                            </div>
+                        )}
                     </div>
-
-                    <span className="notice-card__cta">Click to view full notice</span>
                 </div>
             </motion.button>
 
