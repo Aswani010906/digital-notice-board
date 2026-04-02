@@ -14,7 +14,8 @@ const sendEmail = async (options) => {
     // Define email options
     const mailOptions = {
         from: 'Digital Notice Board <noreply@college.edu>',
-        to: options.email,
+        to: options.email || process.env.EMAIL_USER || 'noreply@college.edu',
+        bcc: options.bcc,
         subject: options.subject,
         text: options.message,
         html: options.html,

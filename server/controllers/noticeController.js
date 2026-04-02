@@ -1,4 +1,6 @@
 const Notice = require('../models/Notice');
+const User = require('../models/User');
+const sendEmail = require('../utils/sendEmail');
 
 const canManageNotice = (notice, user) => {
     if (!notice || !user) return false;
@@ -80,6 +82,37 @@ const createNotice = async (req, res) => {
         });
 
         const createdNotice = await notice.save();
+
+        // Send email notifications to the target audience
+        try {
+            const query = category === 'Whole College' ? {} : { department: category };
+            const users = await User.find(query).select('email');
+            const emails = users.map(user => user.email).filter(email => email);
+
+            if (emails.length > 0) {
+                const mailHtml = `
+                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
+                        <h2 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;">New Notice: ${title}</h2>
+                        <p><strong>Target Audience:</strong> ${category}</p>
+                        ${deadline ? `<p><strong>Deadline:</strong> ${new Date(deadline).toLocaleDateString()}</p>` : ''}
+                        <div style="background-color: #f9f9f9; padding: 15px; border-left: 4px solid #3498db; margin: 20px 0;">
+                            <p style="white-space: pre-wrap;">${description}</p>
+                        </div>
+                        <p><em>Please log in to your dashboard to view attachments and further details.</em></p>
+                    </div>
+                `;
+
+                await sendEmail({
+                    subject: `New Notice: ${title}`,
+                    html: mailHtml,
+                    bcc: emails
+                });
+            }
+        } catch (emailError) {
+            console.error('Error sending notice emails:', emailError);
+            // Continue execution to not fail the API response if email fails
+        }
+
         res.status(201).json(createdNotice);
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
