@@ -70,7 +70,7 @@ const Login = () => {
                             </div>
                         )}
 
-                        <form onSubmit={handleLogin}>
+                        <form onSubmit={handleLogin} autoComplete="off">
                             <div className="form-group">
                                 <label className="form-label">Email Address</label>
                                 <input
@@ -79,6 +79,7 @@ const Login = () => {
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     placeholder="admin@college.edu"
+                                    autoComplete="off"
                                 />
                             </div>
                             <div className="form-group">
@@ -90,6 +91,7 @@ const Login = () => {
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
                                         placeholder="Enter your password"
+                                        autoComplete="new-password"
                                     />
                                     <button
                                         type="button"

@@ -117,9 +117,8 @@ const Home = () => {
                     <section className="student-main-panel">
                         <motion.div className="student-hero" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12, duration: 0.45 }}>
                             <h1>College Notice Board</h1>
-                            <p>
-                                Browse campus-wide updates, society announcements, and notices from your department.
-                                Other department notices are available from the category sidebar.
+                            <p style={{ color: 'var(--text-muted)' }}>
+                                Your definitive source for institutional announcements, societal updates, and departmental news.
                             </p>
                         </motion.div>
 
@@ -187,8 +186,8 @@ const Home = () => {
                             <div className="page-hero__header">
                                 <div>
                                     <h1>College Digital Notice Board</h1>
-                                    <p>
-                                        Stay updated with the latest announcements, events, and important notices from all departments and clubs.
+                                    <p style={{ color: 'var(--text-muted)' }}>
+                                        Global broadcasting hub: Publish, monitor, and coordinate institutional communications.
                                     </p>
                                 </div>
                                 <div className="page-hero__stats">
