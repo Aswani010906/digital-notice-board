@@ -77,5 +77,9 @@ export const userService = {
     createUser: async (data) => {
         const res = await api.post('/users', data);
         return res.data;
+    },
+    updateUser: async (id, data) => {
+        const res = await api.put(`/users/${id}`, data);
+        return res.data;
     }
 };

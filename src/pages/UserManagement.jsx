@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { userService } from '../services/api';
-import { Users, UserPlus, Eye, EyeOff, ChevronLeft, ChevronRight, Shield } from 'lucide-react';
+import { Users, UserPlus, Eye, EyeOff, ChevronLeft, ChevronRight, Shield, Search } from 'lucide-react';
+
 
 const UserManagement = () => {
     const [users, setUsers] = useState([]);
@@ -17,7 +18,12 @@ const UserManagement = () => {
     const [success, setSuccess] = useState(null);
     const [showPassword, setShowPassword] = useState(false);
     const [showAddModal, setShowAddModal] = useState(false);
+    const [editingUser, setEditingUser] = useState(null);
     
+    // Search state
+    const [searchTerm, setSearchTerm] = useState('');
+    const [roleFilter, setRoleFilter] = useState('');
+
     // Pagination state
     const [currentPage, setCurrentPage] = useState(1);
     const usersPerPage = 8;
@@ -35,31 +41,62 @@ const UserManagement = () => {
         }
     };
 
-    // Calculate pagination slices
+    // Filter Logic
+    const filteredUsers = users.filter((user) => {
+        const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                              user.email.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesRole = roleFilter ? user.role === roleFilter : true;
+        return matchesSearch && matchesRole;
+    });
+
+    // Calculate pagination slices using filtered data
     const indexOfLastUser = currentPage * usersPerPage;
     const indexOfFirstUser = indexOfLastUser - usersPerPage;
-    const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
-    const totalPages = Math.ceil(users.length / usersPerPage);
+    const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
+    const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const openAddModal = () => {
+        setEditingUser(null);
+        setFormData({ name: '', email: '', password: '', role: 'student', department: '' });
+        setShowAddModal(true);
+        setError(null);
+        setSuccess(null);
+    };
+
+    const openEditModal = (user) => {
+        setEditingUser(user);
+        setFormData({ name: user.name, email: user.email, password: '', role: user.role, department: user.department || '' });
+        setShowAddModal(true);
+        setError(null);
+        setSuccess(null);
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError(null);
-        setSuccess(null);
 
         try {
-            await userService.createUser(formData);
-            setSuccess('User created successfully!');
-            setFormData({ name: '', email: '', password: '', role: 'student', department: '' });
+            if (editingUser) {
+                const submitData = { ...formData };
+                if (!submitData.password) delete submitData.password;
+                
+                await userService.updateUser(editingUser._id, submitData);
+                setSuccess('User updated successfully!');
+            } else {
+                await userService.createUser(formData);
+                setSuccess('User created successfully!');
+            }
+            
             fetchUsers(); // Refresh list
             setTimeout(() => {
                 setShowAddModal(false);
                 setSuccess(null);
-            }, 1500);
+            }, 1000);
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to create user');
         } finally {
@@ -108,10 +145,42 @@ const UserManagement = () => {
                         <button 
                             className="btn btn-primary" 
                             style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', borderRadius: '12px', padding: '0.6rem 1.25rem' }}
-                            onClick={() => setShowAddModal(true)}
+                            onClick={openAddModal}
                         >
                             <UserPlus size={18} />
                             <span>Add New User</span>
+                        </button>
+                    </div>
+
+                    {/* Filter and Search Bar */}
+                    <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+                        <div style={{ position: 'relative', flex: '1', minWidth: '250px' }}>
+                            <Search size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+                            <input 
+                                type="text" 
+                                placeholder="Search user name, email..." 
+                                className="form-input"
+                                value={searchTerm}
+                                onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
+                                style={{ paddingLeft: '2.5rem', background: '#fff', margin: 0 }} 
+                            />
+                        </div>
+                        <div style={{ minWidth: '200px' }}>
+                            <select 
+                                className="form-input" 
+                                value={roleFilter} 
+                                onChange={(e) => { setRoleFilter(e.target.value); setCurrentPage(1); }}
+                                style={{ background: '#fff', margin: 0 }}
+                            >
+                                <option value="">All Permissions</option>
+                                <option value="student">Student</option>
+                                <option value="admin">Admin / Operational</option>
+                                <option value="department">Department Head</option>
+                                <option value="club">Club Representative</option>
+                            </select>
+                        </div>
+                        <button className="btn btn-primary" style={{ padding: '0.6rem 1.5rem', borderRadius: '8px' }}>
+                            Search
                         </button>
                     </div>
                     
@@ -123,6 +192,7 @@ const UserManagement = () => {
                                     <th style={{ padding: '1.1rem 1.25rem', fontWeight: '700', color: 'var(--text-muted)' }}>Email</th>
                                     <th style={{ padding: '1.1rem 1.25rem', fontWeight: '700', color: 'var(--text-muted)' }}>Role</th>
                                     <th style={{ padding: '1.1rem 1.25rem', fontWeight: '700', color: 'var(--text-muted)' }}>Department</th>
+                                    <th style={{ padding: '1.1rem 1.25rem', fontWeight: '700', color: 'var(--text-muted)' }}>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -159,6 +229,15 @@ const UserManagement = () => {
                                             }}>
                                                 {user.department || 'N/A'}
                                             </span>
+                                        </td>
+                                        <td style={{ padding: '1.1rem 1.25rem' }}>
+                                            <button 
+                                                className="btn btn-outline"
+                                                onClick={() => openEditModal(user)}
+                                                style={{ padding: '0.35rem 0.85rem', fontSize: '0.85rem' }}
+                                            >
+                                                Edit
+                                            </button>
                                         </td>
                                     </tr>
                                 ))}
@@ -214,7 +293,7 @@ const UserManagement = () => {
                                 </button>
                                 
                                 <span style={{ marginLeft: 'auto', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                                    Showing {indexOfFirstUser + 1} to {Math.min(indexOfLastUser, users.length)} of {users.length} users
+                                    Showing {currentUsers.length === 0 ? 0 : indexOfFirstUser + 1} to {Math.min(indexOfLastUser, filteredUsers.length)} of {filteredUsers.length} users
                                 </span>
                             </div>
                         )}
@@ -248,8 +327,8 @@ const UserManagement = () => {
                                         <UserPlus size={22} />
                                     </div>
                                     <div>
-                                        <h2 style={{ fontSize: '1.35rem', marginBottom: '0.2rem' }}>Add New User</h2>
-                                        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Provision new platform access and privileges.</p>
+                                        <h2 style={{ fontSize: '1.35rem', marginBottom: '0.2rem' }}>{editingUser ? 'Edit User' : 'Add New User'}</h2>
+                                        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>{editingUser ? 'Modify user credentials and privileges.' : 'Provision new platform access and privileges.'}</p>
                                     </div>
                                 </div>
 
@@ -296,17 +375,17 @@ const UserManagement = () => {
                                     </div>
 
                                     <div className="form-group" style={{ marginBottom: 0 }}>
-                                        <label className="form-label">Password *</label>
+                                        <label className="form-label">{editingUser ? 'Password (Leave blank to keep unchanged)' : 'Password *'}</label>
                                         <div className="password-input-wrap">
                                             <input
                                                 type={showPassword ? 'text' : 'password'}
                                                 name="password"
-                                                placeholder="Set a strong password..."
+                                                placeholder={editingUser ? 'Enter new password or leave blank' : 'Set a strong password...'}
                                                 value={formData.password}
                                                 onChange={handleChange}
                                                 className="form-input password-input"
                                                 autoComplete="new-password"
-                                                required
+                                                required={!editingUser}
                                             />
                                             <button
                                                 type="button"
@@ -361,7 +440,7 @@ const UserManagement = () => {
                                             Cancel
                                         </button>
                                         <button type="submit" className="btn btn-primary" disabled={loading} style={{ minWidth: '120px' }}>
-                                            {loading ? 'Saving...' : 'Save User'}
+                                            {loading ? 'Saving...' : (editingUser ? 'Update User' : 'Save User')}
                                         </button>
                                     </div>
                                 </form>

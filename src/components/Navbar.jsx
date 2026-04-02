@@ -27,7 +27,7 @@ const Navbar = () => {
                             <NavLink to="/notices" style={({ isActive }) => ({ color: isActive ? 'var(--text-main)' : 'var(--text-muted)', fontWeight: isActive ? '700' : 'normal' })}>Notices</NavLink>
                             <NavLink to="/archive" style={({ isActive }) => ({ color: isActive ? 'var(--text-main)' : 'var(--text-muted)', fontWeight: isActive ? '700' : 'normal' })}>Archive</NavLink>
                             {user.role === 'admin' && (
-                                <NavLink to="/admin/users" style={({ isActive }) => ({ color: isActive ? 'var(--text-main)' : 'var(--text-muted)', fontWeight: isActive ? '700' : '500' })}>Admin Users</NavLink>
+                                <NavLink to="/admin/users" style={({ isActive }) => ({ color: isActive ? 'var(--text-main)' : 'var(--text-muted)', fontWeight: isActive ? '700' : '500' })}>Manage Users</NavLink>
                             )}
                             {user.role !== 'student' && (
                                 <NavLink to="/dashboard" style={({ isActive }) => ({ color: isActive ? 'var(--text-main)' : 'var(--text-muted)', fontWeight: isActive ? '700' : '500' })}>Dashboard</NavLink>
